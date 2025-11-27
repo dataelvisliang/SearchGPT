@@ -1,70 +1,172 @@
-SearchGPT: GPT with Real-Time Web Browsing
-==========================================
+# SearchGPT - AI-Powered Search Engine
 
-Languages / 语言: [English](https://github.com/Wilson-ZheLin/SearchGPT) | [中文](https://github.com/Wilson-ZheLin/SearchGPT/blob/main/README_CN.md)
+An intelligent search engine that combines real-time web search with AI-powered answer generation using OpenRouter API.
 
-GPT's extensive knowledge base covers a wide range of topics but is limited to historical data. To address this, we've integrated web browsing into GPT, connecting its advanced language processing to the internet. 🔗
+**Built on the excellent work of [Wilson-ZheLin/SearchGPT](https://github.com/Wilson-ZheLin/SearchGPT)**
 
-This upgrade enables access to the latest information, enhancing the model's relevance and efficiency in real-time data retrieval, and is faster than web-browsing on the GPT web page.
+## ✨ Features
 
-You may consider this as a tiny implementation of the `ChatGPT search` or `new Bing`, primarily for search engines and Q&A.
+- 🔍 **Real-time Web Search** via Serper (Google API)
+- 🤖 **AI-Powered Answers** using OpenRouter (multiple free models available)
+- 🌐 **Beautiful Streamlit Interface** with Lottie animations
+- 📚 **Semantic Search** with ChromaDB vector database
+- 🎯 **Smart Document Retrieval** using text-embedding-3-small
+- 🔗 **Source Citations** with clickable references
+- 🌍 **Multi-language Support** (auto-detects Chinese/English)
+- ⚡ **Multi-threaded Web Scraping** for fast content extraction
+- 💾 **Export Results** as TXT or JSON
+- 🎨 **No LangChain Required** - lightweight and fast
 
-Please give me a star if you like it! 🌟
-
-Features
---------
-* Rapid real-time web search through [Serper (Google API)](https://serper.dev)
-
-* Automatically adjusts web search and response **language** based on input
-
-* **Multi-threading** to extract main content from web pages, reducing embedding costs
-
-* Semantic search with [OpenAI Embedding](https://platform.openai.com/docs/guides/embeddings/what-are-embeddings) and [ChromaDB](https://www.trychroma.com)
-
-* LLM responses generated with references and web sources
-
-* Supports customization of [models](https://platform.openai.com/docs/models), **AI roles**, and **output formats**
-
-* Matches each quoted sentence in the AI’s response to the **title, snippet, and link of the source website**
-
-
-Architecture
-------------
-
-![Project Architecture](https://github.com/Wilson-ZheLin/GPT-4-Web-Browsing/assets/145169519/d313835d-5b57-4391-8b79-be81fdd4fa8a)
-
-
-Demo
-----
-
-https://github.com/Wilson-ZheLin/GPT-4-Web-Browsing/assets/145169519/6406d20c-efec-4cb9-ad51-510f51ce5212
-
-
-Getting Started
----------------
+## 🚀 Quick Start
 
 ### Prerequisites
 
-To run `main.py` or `llm_answer.py`, you'll need:
-* Stable connection to OpenAI (may be instability in China)
-* [Python 3.11.5](https://www.python.org/downloads/) (not necessarily the same)
-* [Serper API Key](https://serper.dev)
-    * Serper: 2,500 free queries (very adequate and fast)
-* [OpenAI API Key](https://openai.com/blog/openai-api)
-    * OpenAI: First $5 is free (GPT-3.5-turbo-16k  recommended)
-    
-### Installation
-1. Install the required packages (consider adding `-i https://pypi.tuna.tsinghua.edu.cn/simple` in China):
+- Python 3.11+ recommended
+- [OpenRouter API Key](https://openrouter.ai/) (free tier available)
+- [Serper API Key](https://serper.dev/) (2,500 free queries)
 
+### Installation
+
+1. **Clone the repository**
+```bash
+git clone <your-repo-url>
+cd SearchGPT
 ```
+
+2. **Install dependencies**
+```bash
 pip install -r requirements.txt
 ```
 
-2. Save your **API Keys** in `config.yaml`
+3. **Configure API Keys**
 
-3. run `main.py` or `llm_answer.py`, where you can change the query
+You can either:
+- Enter them in the Streamlit UI when running the app, OR
+- Save them in `src/config/config.yaml`:
 
-License
--------
+```yaml
+model_name: x-ai/grok-4.1-fast:free
+openrouter_api_key: "your-openrouter-key-here"
+serper_api_key: "your-serper-key-here"
+```
 
-This project is licensed under the [MIT License](./LICENSE).
+### Running the Application
+
+**Streamlit Web Interface (Recommended):**
+```bash
+streamlit run app.py
+```
+
+**Command Line:**
+```bash
+python src/main.py
+```
+
+## 🎯 Available Models
+
+### Free Models (via OpenRouter)
+- **x-ai/grok-4.1-fast:free** - GPT-4 equivalent (recommended)
+- **openai/gpt-oss-20b:free** - GPT-3.5 equivalent
+
+### Premium Models (require credits)
+- openai/gpt-3.5-turbo
+- openai/gpt-4
+- anthropic/claude-3-haiku
+- anthropic/claude-3-sonnet
+
+## 📁 Project Structure
+
+```
+SearchGPT/
+├── app.py                      # Streamlit web interface
+├── src/
+│   ├── main.py                # CLI entry point
+│   ├── fetch_web_content.py   # Web scraping with multi-threading
+│   ├── serper_service.py      # Serper API integration
+│   ├── retrieval.py           # Vector database & embeddings
+│   ├── llm_answer.py          # AI answer generation
+│   ├── llm_service.py         # OpenRouter API service
+│   ├── text_utils.py          # Text processing utilities
+│   └── config/
+│       └── config.yaml        # Configuration file
+├── requirements.txt           # Python dependencies
+└── README.md                  # This file
+```
+
+## 🔧 Configuration
+
+The `src/config/config.yaml` file supports:
+
+- **model_name**: AI model to use
+- **openrouter_api_key**: Your OpenRouter API key
+- **serper_api_key**: Your Serper API key
+- **template**: Custom prompt template for AI responses
+
+## 📖 Usage Examples
+
+### Via Streamlit UI
+
+1. Launch the app: `streamlit run app.py`
+2. Enter your API keys in the sidebar (or use saved keys)
+3. Select your preferred AI model
+4. Choose an AI profile (Researcher, Technical Expert, etc.)
+5. Enter your search query
+6. Click "🚀 Search"
+
+### Via Command Line
+
+Edit the query in `src/main.py` and run:
+```bash
+python src/main.py
+```
+
+## 🛠️ Key Technologies
+
+- **OpenRouter API** - Access to multiple AI models
+- **Serper API** - Fast Google search results
+- **ChromaDB** - Vector database for semantic search
+- **Streamlit** - Modern web interface
+- **BeautifulSoup4** - Web scraping
+- **text-embedding-3-small** - Efficient text embeddings
+
+## 🔍 How It Works
+
+1. **Search**: Query sent to Serper API for real-time web results
+2. **Scrape**: Multi-threaded extraction of content from top results
+3. **Embed**: Text chunked and converted to vector embeddings
+4. **Retrieve**: Semantic search finds most relevant content
+5. **Generate**: AI model creates comprehensive answer with citations
+
+## 📝 Logging
+
+Comprehensive logging is built-in. Check your terminal for detailed logs:
+- Serper API requests and responses
+- Web scraping progress (per thread)
+- Embedding generation status
+- AI model responses
+- Error diagnostics
+
+## 🤝 Contributing
+
+Contributions are welcome! Feel free to:
+- Report bugs
+- Suggest features
+- Submit pull requests
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 🙏 Acknowledgments
+
+This project is built on the foundation of [Wilson-ZheLin/SearchGPT](https://github.com/Wilson-ZheLin/SearchGPT). Significant enhancements include:
+- Migration from OpenAI to OpenRouter API
+- Removal of LangChain dependencies
+- Addition of Streamlit web interface
+- Modern ChromaDB integration
+- Comprehensive logging system
+- Updated embedding models
+
+## ⭐ Star This Repo
+
+If you find this project useful, please give it a star! ⭐

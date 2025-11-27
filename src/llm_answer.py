@@ -3,10 +3,8 @@ import os
 import yaml
 from fetch_web_content import WebContentFetcher
 from retrieval import EmbeddingRetriever
-from langchain.chat_models import ChatOpenAI
-from langchain.prompts import PromptTemplate
-from langchain.schema import HumanMessage
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+from llm_service import OpenRouterService
+from text_utils import PromptTemplate
 
 class GPTAnswer:
     TOP_K = 10  # Top K documents to retrieve
@@ -17,18 +15,22 @@ class GPTAnswer:
         with open(config_path, 'r') as file:
             self.config = yaml.safe_load(file)
         self.model_name = self.config["model_name"]
-        self.api_key = self.config["openai_api_key"]
+        self.api_key = self.config["openrouter_api_key"]
+        # Initialize OpenRouter service
+        self.llm_service = OpenRouterService(api_key=self.api_key, model_name=self.model_name)
 
     def _format_reference(self, relevant_docs_list, link_list):
         # Format the references from the retrieved documents for use in the prompt
-        reference_url_list = [(relevant_docs_list[i].metadata)['url'] for i in range(self.TOP_K)]
-        reference_content_list = [relevant_docs_list[i].page_content for i in range(self.TOP_K)]
+        # Use the actual number of documents available, not TOP_K
+        num_docs = min(len(relevant_docs_list), self.TOP_K)
+        reference_url_list = [(relevant_docs_list[i].metadata)['url'] for i in range(num_docs)]
+        reference_content_list = [relevant_docs_list[i].page_content for i in range(num_docs)]
         reference_index_list = [link_list.index(link)+1 for link in reference_url_list]
         rearranged_index_list = self._rearrange_index(reference_index_list)
 
         # Create a formatted string of references
         formatted_reference = "\n"
-        for i in range(self.TOP_K):
+        for i in range(num_docs):
             formatted_reference += ('Webpage[' + str(rearranged_index_list[i]) + '], url: ' + reference_url_list[i] + ':\n' + reference_content_list[i] + '\n\n\n')
         return formatted_reference
 
@@ -45,9 +47,7 @@ class GPTAnswer:
         return rearranged_index_list
 
     def get_answer(self, query, relevant_docs, language, output_format, profile):
-        # Create an instance of ChatOpenAI and generate an answer
-        llm = ChatOpenAI(model_name=self.model_name, openai_api_key=self.api_key, temperature=0.0, streaming=True, callbacks=[StreamingStdOutCallbackHandler()])
-        
+        # Generate an answer using OpenRouter API
         template = self.config["template"]
         prompt_template = PromptTemplate(
             input_variables=["profile", "context_str", "language", "query", "format"],
@@ -57,10 +57,18 @@ class GPTAnswer:
         profile = "conscientious researcher" if not profile else profile
         summary_prompt = prompt_template.format(context_str=relevant_docs, language=language, query=query, format=output_format, profile=profile)
         print("\n\nThe message sent to LLM:\n", summary_prompt)
-        print("\n\n", "="*30, "GPT's Answer: ", "="*30, "\n")
-        gpt_answer = llm([HumanMessage(content=summary_prompt)])
+        print("\n\n", "="*30, "LLM's Answer: ", "="*30, "\n")
 
-        return gpt_answer
+        # Call OpenRouter API with streaming
+        messages = [{"role": "user", "content": summary_prompt}]
+        response = self.llm_service.call_openrouter(messages, temperature=0.0, stream=True)
+
+        # Create a response object similar to LangChain's message format
+        class AIMessage:
+            def __init__(self, content):
+                self.content = content
+
+        return AIMessage(response["content"])
 
 # Example usage
 if __name__ == "__main__":
