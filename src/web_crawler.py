@@ -1,6 +1,16 @@
 import requests
 import re
+import io
+import logging
 from bs4 import BeautifulSoup
+try:
+    from PyPDF2 import PdfReader
+    PDF_SUPPORT = True
+except ImportError:
+    PDF_SUPPORT = False
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 class WebScraper:
     def __init__(self, user_agent='macOS'):
@@ -31,18 +41,15 @@ class WebScraper:
     def get_webpage_html(self, url):
         # Fetch the HTML content of a webpage from a given URL
         response = requests.Response()  # Create an empty Response object
-        if url.endswith(".pdf"):
-            # Skip PDF files which are time consuming
-            return response
 
         try:
             # Attempt to get the webpage content with specified headers and timeout
-            response = requests.get(url, headers=self.headers, timeout=8)
+            response = requests.get(url, headers=self.headers, timeout=15)
             response.encoding = "utf-8"
         except requests.exceptions.Timeout:
             # Add timeout exception handling here
             return response
-        
+
         return response
 
     def convert_html_to_soup(self, html):
@@ -61,9 +68,45 @@ class WebScraper:
                 main_content.append(tag_text)
         return "\n".join(main_content).strip()
 
+    def extract_pdf_content(self, pdf_response):
+        # Extract text content from a PDF response
+        if not PDF_SUPPORT:
+            logger.warning("PyPDF2 not available, skipping PDF extraction")
+            return ""
+
+        try:
+            logger.info("Extracting content from PDF")
+            pdf_file = io.BytesIO(pdf_response.content)
+            pdf_reader = PdfReader(pdf_file)
+
+            text_content = []
+            # Extract text from all pages
+            for i, page in enumerate(pdf_reader.pages):
+                page_text = page.extract_text()
+                if page_text:
+                    text_content.append(page_text)
+
+            full_text = "\n".join(text_content).strip()
+            logger.info(f"Successfully extracted {len(full_text)} characters from PDF ({len(pdf_reader.pages)} pages)")
+            return full_text
+        except Exception as e:
+            # If PDF extraction fails, return empty string
+            logger.error(f"Failed to extract PDF content: {e}")
+            return ""
+
     def scrape_url(self, url, rule=0):
         # Public method to scrape a URL and extract its main content
         webpage_html = self.get_webpage_html(url)
+
+        # Check if it's a PDF by URL or content type
+        if url.endswith(".pdf") or (hasattr(webpage_html, 'headers') and webpage_html.headers.get('Content-Type', '').startswith('application/pdf')):
+            logger.info(f"Detected PDF URL: {url}")
+            if PDF_SUPPORT:
+                return self.extract_pdf_content(webpage_html)
+            else:
+                logger.warning("PDF detected but PyPDF2 not available")
+                return ""  # Skip if PyPDF2 not available
+
         soup = self.convert_html_to_soup(webpage_html)
         main_content = self.extract_main_content(soup, rule)
         return main_content

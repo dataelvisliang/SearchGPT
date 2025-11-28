@@ -3,7 +3,7 @@ import os
 import logging
 from fetch_web_content import WebContentFetcher
 from text_utils import RecursiveTextSplitter
-from llm_service import OpenRouterEmbeddings
+from llm_service import GiteeEmbeddings, OpenRouterEmbeddings
 
 # Configure logging
 logging.basicConfig(
@@ -46,14 +46,27 @@ class EmbeddingRetriever:
 
         logger.info(f"Created {len(texts)} text chunks from {len(contents_list)} documents")
 
+        # Determine which embedding service to use
+        use_gitee = self.config.get("gitee_api_key") and self.config.get("gitee_api_key") != ""
+
+        if use_gitee:
+            logger.info("Using Gitee AI BGE-M3 embeddings")
+            embeddings = GiteeEmbeddings(
+                api_key=self.config["gitee_api_key"],
+                model=self.config.get("embedding_model", "bge-m3")
+            )
+        else:
+            logger.info("Using OpenRouter embeddings")
+            embeddings = OpenRouterEmbeddings(
+                api_key=self.config["openrouter_api_key"],
+                model='openai/text-embedding-3-small'
+            )
+
         if CHROMA_AVAILABLE:
             logger.info("Using LangChain Chroma wrapper for retrieval")
             # Use LangChain's Chroma wrapper if available
             from langchain.vectorstores import Chroma
-            db = Chroma.from_documents(
-                texts,
-                OpenRouterEmbeddings(api_key=self.config["openrouter_api_key"], model='openai/text-embedding-3-small')
-            )
+            db = Chroma.from_documents(texts, embeddings)
             retriever = db.as_retriever(search_kwargs={"k": self.TOP_K})
             results = retriever.get_relevant_documents(query)
             logger.info(f"Retrieved {len(results)} relevant documents")
@@ -61,21 +74,15 @@ class EmbeddingRetriever:
         else:
             logger.info("Using ChromaDB directly for retrieval")
             # Use ChromaDB directly without LangChain
-            return self._retrieve_with_chromadb(texts, query)
+            return self._retrieve_with_chromadb(texts, query, embeddings)
 
-    def _retrieve_with_chromadb(self, documents: list, query: str):
+    def _retrieve_with_chromadb(self, documents: list, query: str, embeddings):
         """Retrieve documents using ChromaDB directly (without LangChain)"""
         import chromadb
         import tempfile
         import shutil
 
         logger.info(f"Initializing ChromaDB for {len(documents)} documents")
-
-        # Create embeddings client
-        embeddings = OpenRouterEmbeddings(
-            api_key=self.config["openrouter_api_key"],
-            model='openai/text-embedding-3-small'
-        )
 
         # Create temporary directory for ChromaDB
         temp_dir = tempfile.mkdtemp()

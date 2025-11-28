@@ -142,10 +142,87 @@ class OpenRouterService:
             raise
 
 
+class GiteeEmbeddings:
+    """Wrapper for Gitee AI embeddings (uses BGE-M3 model)"""
+
+    def __init__(self, api_key: str, model: str = "bge-m3"):
+        """
+        Initialize Gitee AI embeddings
+
+        Args:
+            api_key: Gitee AI API key
+            model: Embedding model identifier (default: bge-m3)
+        """
+        from openai import OpenAI
+
+        self.api_key = api_key
+        self.model = model
+        self.client = OpenAI(
+            base_url="https://ai.gitee.com/v1",
+            api_key=api_key,
+            default_headers={"X-Failover-Enabled": "true"}
+        )
+        logger.info(f"Initialized Gitee AI embeddings with model: {model}")
+
+    def embed_documents(self, texts: list) -> list:
+        """
+        Embed a list of documents
+
+        Args:
+            texts: List of text strings to embed
+
+        Returns:
+            List of embedding vectors
+        """
+        logger.info(f"Generating embeddings for {len(texts)} documents using Gitee AI {self.model}")
+        try:
+            embeddings = []
+            # Process in batches to avoid rate limits
+            batch_size = 10
+            for i in range(0, len(texts), batch_size):
+                batch = texts[i:i+batch_size]
+                response = self.client.embeddings.create(
+                    input=batch,
+                    model=self.model
+                )
+                batch_embeddings = [item.embedding for item in response.data]
+                embeddings.extend(batch_embeddings)
+                logger.debug(f"Processed batch {i//batch_size + 1}/{(len(texts)-1)//batch_size + 1}")
+
+            logger.info(f"Successfully generated {len(embeddings)} embeddings")
+            return embeddings
+        except Exception as e:
+            logger.error(f"Error generating embeddings with Gitee AI: {e}", exc_info=True)
+            raise
+
+    def embed_query(self, text: str) -> list:
+        """
+        Embed a single query text
+
+        Args:
+            text: Query text to embed
+
+        Returns:
+            Embedding vector
+        """
+        logger.debug(f"Generating embedding for query using Gitee AI {self.model}")
+        try:
+            response = self.client.embeddings.create(
+                input=text,
+                model=self.model
+            )
+            embedding = response.data[0].embedding
+            logger.debug("Query embedding generated successfully")
+            return embedding
+        except Exception as e:
+            logger.error(f"Error generating query embedding with Gitee AI: {e}", exc_info=True)
+            raise
+
+
 class OpenRouterEmbeddings:
     """Wrapper for OpenRouter embeddings (uses text-embedding-ada-002 compatible model)"""
 
-    def __init__(self, api_key: str, model: str = "openai/text-embedding-ada-002"):
+    def __init__(self, api_key: str, model: str = "openai/text-embedding-3-small"):
         """
         Initialize OpenRouter embeddings
 

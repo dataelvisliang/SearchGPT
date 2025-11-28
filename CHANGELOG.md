@@ -2,6 +2,101 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.0] - 2025-11-27
+
+### New Features
+
+#### 📄 PDF Reading Capability
+- **Added PDF content extraction**
+  - Integrated PyPDF2 library for PDF parsing
+  - `web_crawler.py` now detects and extracts text from PDF files
+  - Automatically detects PDFs by URL extension (.pdf) or Content-Type header
+  - Extracts text from all pages and returns as concatenated string
+  - Graceful fallback if PyPDF2 not available
+  - Added comprehensive logging for PDF extraction process
+
+#### 🇨🇳 Gitee AI Integration
+- **Added Gitee AI API key input**
+  - New input field in sidebar for Gitee AI API key
+  - Supports BGE-M3 embeddings via ai.gitee.com
+  - Status indicator showing which embedding service is active
+  - Falls back to OpenRouter embeddings if Gitee key not provided
+  - API key saved to config.yaml when provided
+
+#### 🤖 Streamlined Model Selection
+- **Reduced model options to core free models**
+  - Kept only `x-ai/grok-4.1-fast:free` (primary)
+  - Kept only `openai/gpt-oss-20b:free` (alternative)
+  - Removed other model options for simplified user experience
+
+### UI/UX Improvements
+
+#### 📊 Detailed Progress Indicators
+- **4-step progress tracking with real-time updates**
+  - Step 1: "🌐 Searching the web..." (shows result count)
+  - Step 2: "📄 Fetching content from X pages..." (shows successful fetch count)
+  - Step 3: "🔍 Creating embeddings and searching..." (shows relevant section count)
+  - Step 4: "🤖 Generating AI answer (streaming)..."
+  - Each step displays success message with statistics before proceeding
+  - All status messages aligned with search bar width using centered columns
+
+#### ⚡ Real-time Streaming Output
+- **Implemented word-by-word streaming from OpenRouter**
+  - Direct integration with OpenRouter's Server-Sent Events (SSE) API
+  - Removed batch response display in favor of incremental updates
+  - Answer appears progressively as LLM generates it
+  - Better user experience with immediate feedback
+  - Uses `response.iter_lines()` for real-time chunk processing
+
+#### 🎨 Markdown Rendering
+- **Enhanced answer display with full markdown support**
+  - Changed from HTML rendering to `st.markdown()`
+  - Properly renders bold, italic, lists, code blocks, and links
+  - Better formatting for structured AI responses
+  - Preserves markdown in citations and references
+
+#### 📐 Consistent Layout Width
+- **All interface elements now match search bar width**
+  - Status messages in centered columns `[1, 6, 1]`
+  - Error messages and expandable error details
+  - References section (Quick Links and Detailed Sources tabs)
+  - Download buttons (TXT and JSON export)
+  - Loading animation positioned with status messages
+  - Creates cohesive, professional appearance
+
+#### 🎭 Removed Subtitle
+- **Cleaner header design**
+  - Removed "AI-Powered Search Engine with OpenRouter" subtitle
+  - Header now shows only main title
+  - More minimalist interface
+
+### Technical Improvements
+
+#### 🔧 Dependencies
+- **Updated requirements.txt**
+  - Added `PyPDF2>=3.0.0` for PDF support
+  - Updated `openai>=1.0.0` for latest SDK compatibility
+
+#### 🔐 Security
+- **API key handling improvements**
+  - Removed all hardcoded API keys from config.yaml
+  - All API keys now stored as empty strings in default config
+  - Users must provide keys via UI (not committed to git)
+
+### Bug Fixes
+- **Fixed indentation errors in references section**
+  - Corrected indentation within `with tab2:` block
+  - References now display properly in centered layout
+
+### Files Modified
+
+- `app.py` - Added Gitee input, streaming output, 4-step progress, markdown rendering, centered layout
+- `src/web_crawler.py` - Added PDF detection and extraction methods
+- `src/config/config.yaml` - Added gitee_api_key field, cleared hardcoded keys
+- `requirements.txt` - Added PyPDF2 dependency
+
+---
+
 ## [2.0.0] - 2025-11-26
 
 ### Major Changes

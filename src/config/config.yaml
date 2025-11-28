@@ -1,3 +1,5 @@
+embedding_model: bge-m3
+gitee_api_key: ""
 model_name: x-ai/grok-4.1-fast:free
 openrouter_api_key: ""
 serper_api_key: ""
@@ -5,11 +7,9 @@ template: "Web search result:\n{context_str}\n\nInstructions: You are a/an {prof
   \ Using the provided web search results, write a comprehensive and detailed reply\
   \ to the given query. \nMake sure to cite results using [number] notation after\
   \ the reference.\nAt the end of the answer, list the corresponding references with\
-  \ indexes, each reference contains the urls and quoted sentences from the web search\
-  \ results by the order you marked in the answer above and these sentences should\
-  \ be exactly the same as in the web search results.\nHere is an example of a reference:\n\
-  \    [1] URL: https://www.pocketgamer.biz/news/81670/tencent-and-netease-dominated-among-chinas-top-developers-in-q1/\n\
-  \        Quoted sentence: Tencent accounted for roughly 50% of domestic market revenue\
-  \ for the quarter, compared to 40% in Q1 2022.\n\nAnswer in language: {language}\n\
-  Query: {query}\nOutput Format: {format}\nPlease organize your output according to\
-  \ the Output Format. If the Output Format is empty, you can ignore it."
+  \ indexes. Each reference should include:\n- The URL\n- A relevant quote from that\
+  \ source (exactly as it appears in the search results)\n\nExample format:\n[1] https://example.com\n\
+  \    \"Exact quote from the source that supports the information cited.\"\n\nAnswer\
+  \ in language: {language}\nQuery: {query}\nOutput Format: {format}\nPlease organize\
+  \ your output according to the Output Format. If the Output Format is empty, you\
+  \ can ignore it."
