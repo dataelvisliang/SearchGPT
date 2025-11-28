@@ -21,7 +21,7 @@ All notable changes to this project will be documented in this file.
   - Supports BGE-M3 embeddings via ai.gitee.com
   - Status indicator showing which embedding service is active
   - Falls back to OpenRouter embeddings if Gitee key not provided
-  - API key saved to config.yaml when provided
+  - API keys stored in temporary session file only (not saved to config.yaml)
 
 #### 🤖 Streamlined Model Selection
 - **Reduced model options to core free models**

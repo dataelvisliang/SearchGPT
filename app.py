@@ -251,7 +251,7 @@ if search_button and query:
         st.stop()
 
     try:
-        # Update config with API keys if provided
+        # Update config in memory only (do not save to file)
         if openrouter_api_key or serper_api_key or gitee_api_key:
             import yaml
             config_path = os.path.join(os.path.dirname(__file__), 'src', 'config', 'config.yaml')
@@ -259,7 +259,7 @@ if search_button and query:
             with open(config_path, 'r') as file:
                 config = yaml.safe_load(file)
 
-            # Temporarily update config with user-provided keys
+            # Update config in memory with user-provided keys
             if openrouter_api_key:
                 config['openrouter_api_key'] = openrouter_api_key
             if serper_api_key:
@@ -269,9 +269,14 @@ if search_button and query:
             if model_name:
                 config['model_name'] = model_name
 
-            # Write temporary config
-            with open(config_path, 'w') as file:
-                yaml.dump(config, file)
+            # Save updated config to a temporary location for this session
+            import tempfile
+            temp_config_file = tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.yaml')
+            yaml.dump(config, temp_config_file)
+            temp_config_file.close()
+
+            # Update the config path to use the temporary file
+            os.environ['SEARCHGPT_CONFIG_PATH'] = temp_config_file.name
 
         # Show loading animation and status in centered columns
         start_time = time.time()
