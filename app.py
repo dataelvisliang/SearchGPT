@@ -81,6 +81,45 @@ st.markdown("""
         text-align: center;
         margin-bottom: 2rem;
     }
+
+    /* Generating answer animation */
+    .generating-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        gap: 12px;
+    }
+
+    .spinner {
+        width: 20px;
+        height: 20px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #4CAF50;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .generating-text {
+        font-size: 16px;
+        color: #666;
+        font-weight: 500;
+    }
+
+    .breathing-dots::after {
+        content: '...';
+        animation: breathe 1.5s ease-in-out infinite;
+    }
+
+    @keyframes breathe {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 1; }
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -251,15 +290,20 @@ if search_button and query:
         st.stop()
 
     try:
-        # Update config in memory only (do not save to file)
+        # Temporarily update config file with API keys for this search session
+        config_updated = False
+        original_config = None
+
         if openrouter_api_key or serper_api_key or gitee_api_key:
             import yaml
             config_path = os.path.join(os.path.dirname(__file__), 'src', 'config', 'config.yaml')
 
+            # Read and backup original config
             with open(config_path, 'r') as file:
-                config = yaml.safe_load(file)
+                original_config = file.read()
+                config = yaml.safe_load(original_config)
 
-            # Update config in memory with user-provided keys
+            # Update config with user-provided keys
             if openrouter_api_key:
                 config['openrouter_api_key'] = openrouter_api_key
             if serper_api_key:
@@ -269,14 +313,10 @@ if search_button and query:
             if model_name:
                 config['model_name'] = model_name
 
-            # Save updated config to a temporary location for this session
-            import tempfile
-            temp_config_file = tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.yaml')
-            yaml.dump(config, temp_config_file)
-            temp_config_file.close()
-
-            # Update the config path to use the temporary file
-            os.environ['SEARCHGPT_CONFIG_PATH'] = temp_config_file.name
+            # Write updated config temporarily
+            with open(config_path, 'w') as file:
+                yaml.dump(config, file)
+            config_updated = True
 
         # Show loading animation and status in centered columns
         start_time = time.time()
@@ -369,8 +409,14 @@ if search_button and query:
             # Display answer with streaming
             col1_answer, col2_answer, col3_answer = st.columns([1, 6, 1])
             with col2_answer:
-                st.markdown("## 💡 AI-Generated Answer")
                 answer_placeholder = st.empty()
+                # Show generating animation initially
+                answer_placeholder.markdown("""
+                    <div class="generating-container">
+                        <div class="spinner"></div>
+                        <div class="generating-text">Generating your answers<span class="breathing-dots"></span></div>
+                    </div>
+                """, unsafe_allow_html=True)
 
             # Get streaming answer from LLM
             from llm_service import OpenRouterService
@@ -484,6 +530,12 @@ if search_button and query:
                 st.write("2. Ensure you have internet connectivity")
                 st.write("3. Try a different search query")
                 st.write("4. Check the console/terminal for detailed logs")
+    finally:
+        # Restore original config file if it was modified
+        if config_updated and original_config:
+            config_path = os.path.join(os.path.dirname(__file__), 'src', 'config', 'config.yaml')
+            with open(config_path, 'w') as file:
+                file.write(original_config)
 
 # Display results (only if not streaming - streaming already displayed above)
 if st.session_state.answer and not search_button:
