@@ -2,6 +2,163 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.0] - 2025-11-28
+
+### New Features
+
+#### 🔍 Comprehensive Pipeline Tracing
+- **Complete visibility into RAG pipeline execution**
+  - Added expandable "Pipeline Trace" panel showing all steps
+  - Captures and displays data from every stage of processing
+  - Helps with debugging, learning, and optimization
+  - Stored in session state for persistence
+
+#### 📊 Trace Data Captured
+
+**Step 1: Web Search**
+- Query submitted by user
+- Number of results found from Serper API
+- All URLs, titles, and snippets returned
+- Complete search results metadata
+
+**Step 2: Content Scraping**
+- Total pages attempted vs successful scrapes
+- Failed scrape detection with status indicators
+- Content lengths for each URL
+- Preview of scraped content (first 200 characters)
+- Clear success (✅) / failure (❌) indicators
+
+**Step 3: Embedding & Retrieval**
+- Number of relevant chunks retrieved
+- **Similarity scores** for each chunk (color-coded)
+  - Green (>0.7): High relevance
+  - Orange (>0.5): Medium relevance
+  - Red (<0.5): Low relevance
+- Source URL tracking for each chunk
+- Full content preview of retrieved chunks
+- Chunk length in characters
+
+**Step 4: Answer Generation** (Most Detailed)
+- AI profile/persona used (researcher, expert, etc.)
+- **Chunks sent to LLM** with similarity scores
+- **Formatted context** showing [1], [2] citation format
+- **Complete prompt** sent to LLM including:
+  - Template instructions
+  - All context chunks with citations
+  - Query text
+  - Language specification
+  - Profile/persona assignment
+- Model name and temperature setting
+- Generated answer length
+- Time taken to generate answer
+
+#### 🎨 UI Enhancements
+
+**Trace Display Features**
+- Collapsible expander: "📊 View Detailed Pipeline Execution Trace"
+- Organized by pipeline steps with clear section headers
+- Scrollable text areas for long content
+- Color-coded similarity scores for quick assessment
+- Summary statistics panel with metrics
+- Separated "Chunks Retrieved" vs "Chunks Sent to LLM"
+
+**Similarity Score Visualization**
+- Calculated as: `similarity = 1 - distance` (ChromaDB L2 distance)
+- Displayed with 4 decimal precision (e.g., 0.8542)
+- Color coding for instant quality assessment
+- Shows in both retrieval and generation sections
+
+#### 🐛 Bug Fixes
+
+**text_utils.py**
+- Fixed `ValueError: empty separator` error
+- Added check to skip empty string ("") in separators list
+- Prevents crash when recursive text splitter reaches empty separator
+- Falls back to character-count splitting if no separators work
+
+**app.py**
+- Fixed trace_data dictionary overwriting issue
+- Changed from dict replacement to `.update()` method
+- Proper initialization of generation trace data
+- Ensures all trace data persists correctly
+
+**retrieval.py**
+- Added similarity score calculation to ChromaDB results
+- Stores scores in document metadata
+- Converts ChromaDB distance to similarity score
+- Rounded to 4 decimal places for readability
+
+### Technical Improvements
+
+#### 🔧 Trace Data Structure
+```python
+trace_data = {
+    'query': str,
+    'search_results': {
+        'count': int,
+        'urls': list,
+        'titles': list,
+        'snippets': list
+    },
+    'scraped_content': {
+        'total_pages': int,
+        'successful_scrapes': int,
+        'failed_scrapes': int,
+        'content_lengths': list,
+        'content_previews': list[dict]
+    },
+    'retrieval': {
+        'num_relevant_docs': int,
+        'relevant_docs': list[dict with similarity_score]
+    },
+    'generation': {
+        'model': str,
+        'temperature': float,
+        'profile': str,
+        'chunks_sent': list[dict],
+        'formatted_context': str,
+        'prompt': str,
+        'answer_length': int,
+        'answer_preview': str,
+        'time_taken': float
+    }
+}
+```
+
+#### 🎯 Session State Management
+- `st.session_state.trace_data` stores complete trace
+- Persists across Streamlit reruns
+- Cleared when "Clear Results" button clicked
+- Enables trace viewing after search completes
+
+### Use Cases
+
+#### Debugging
+- **Verify retrieval quality**: Check similarity scores of chunks
+- **Inspect exact prompts**: See what was sent to LLM
+- **Diagnose failures**: Identify which URLs failed to scrape
+- **Check context assembly**: Verify chunks were formatted correctly
+
+#### Learning & Education
+- **Understand RAG pipelines**: See complete data flow
+- **Study prompt engineering**: Learn from actual prompts
+- **Visualize embeddings**: See similarity scores in action
+- **Learn citation formatting**: See [1], [2] mapping to sources
+
+#### Optimization
+- **Identify low-quality chunks**: Find low similarity scores
+- **Improve prompts**: Iterate on prompt templates
+- **Tune retrieval**: Adjust chunk sizes, overlap, top-k
+- **Measure performance**: Track time and token usage per step
+
+### Files Modified
+
+- `app.py` - Added complete tracing system with UI display
+- `src/retrieval.py` - Added similarity score calculation and metadata
+- `src/text_utils.py` - Fixed empty separator bug
+
+---
+
 ## [2.1.0] - 2025-11-27
 
 ### New Features
