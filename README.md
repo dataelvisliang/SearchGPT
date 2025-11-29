@@ -10,12 +10,15 @@ An intelligent search engine that combines real-time web search with AI-powered 
 - 🤖 **AI-Powered Answers** using OpenRouter (multiple free models available)
 - 🌐 **Beautiful Streamlit Interface** with Lottie animations
 - 📚 **Semantic Search** with ChromaDB vector database
-- 🎯 **Smart Document Retrieval** using text-embedding-3-small
+- 🎯 **Smart Document Retrieval** using text-embedding-3-small or Gitee BGE-M3
 - 🔗 **Source Citations** with clickable references
 - 🌍 **Multi-language Support** (auto-detects Chinese/English)
 - ⚡ **Multi-threaded Web Scraping** for fast content extraction
 - 💾 **Export Results** as TXT or JSON
 - 🎨 **No LangChain Required** - lightweight and fast
+- 📊 **Complete Pipeline Tracing** - see every step with timing, API calls, and similarity scores
+- 🔎 **Full Prompt Visibility** - inspect exactly what's sent to the LLM
+- ⏱️ **Performance Metrics** - track time spent on each pipeline step
 
 ## 🚀 Quick Start
 
@@ -102,6 +105,23 @@ The `src/config/config.yaml` file supports:
 - **serper_api_key**: Your Serper API key
 - **template**: Custom prompt template for AI responses
 
+## 📸 Screenshots
+
+### Main Interface
+![SearchGPT Interface](assets/SearchGPT.png)
+
+### Pipeline Trace - Search & Scraping
+![Pipeline Trace 1](assets/Trace%201.png)
+
+### Pipeline Trace - Embeddings & Retrieval
+![Pipeline Trace 2](assets/Trace%202.png)
+
+### Pipeline Trace - Chunks & Similarity Scores
+![Pipeline Trace 3](assets/Trace%203.png)
+
+### Pipeline Trace - Full Prompt & Generation
+![Pipeline Trace 4](assets/Trace%204.png)
+
 ## 📖 Usage Examples
 
 ### Via Streamlit UI
@@ -133,9 +153,21 @@ python src/main.py
 
 1. **Search**: Query sent to Serper API for real-time web results
 2. **Scrape**: Multi-threaded extraction of content from top results
-3. **Embed**: Text chunked and converted to vector embeddings
-4. **Retrieve**: Semantic search finds most relevant content
+3. **Embed**: Text chunked and converted to vector embeddings (OpenRouter or Gitee AI)
+4. **Retrieve**: Semantic search finds most relevant content with similarity scores
 5. **Generate**: AI model creates comprehensive answer with citations
+
+### Pipeline Tracing
+
+SearchGPT provides complete visibility into every step of the RAG pipeline:
+
+- **Step 1 - Search**: See all URLs, titles, and snippets returned by Serper
+- **Step 2 - Scraping**: Track success/failure for each page with content previews
+- **Step 3 - Embeddings**: View API calls made, timing, and chunks processed
+- **Step 4 - Retrieval**: Inspect similarity scores for each retrieved chunk (color-coded by relevance)
+- **Step 5 - Generation**: See the exact prompt sent to the LLM and all context chunks
+
+All steps include timing information to help identify bottlenecks and optimize performance.
 
 ## 📝 Logging
 

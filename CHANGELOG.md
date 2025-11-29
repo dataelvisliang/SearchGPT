@@ -6,6 +6,28 @@ All notable changes to this project will be documented in this file.
 
 ### New Features
 
+#### ⏱️ Enhanced Pipeline Timing & Metrics
+- **Step-by-step timing information**
+  - Shows time taken for each pipeline step (search, scrape, embed, generate)
+  - Embedded API call tracking with detailed metrics
+  - Individual API call timing for embed_documents and embed_query
+  - Total embedding time calculation
+
+#### 📡 Embedding API Call Details
+- **Complete visibility into embedding operations**
+  - Tracks number of API calls to OpenRouter/Gitee
+  - Shows chunks processed per API call
+  - Displays time spent on each embedding API call
+  - Differentiates between document embedding and query embedding
+  - Provider-specific metrics (OpenRouter text-embedding-3-small or Gitee BGE-M3)
+
+#### 🧹 Text Cleaning & Formatting
+- **Cleaned formatted context for better readability**
+  - Removes multiple consecutive empty lines (max 1 empty line between sections)
+  - Consolidates multiple spaces to single spaces
+  - Trims leading/trailing whitespace on each line
+  - Results in cleaner prompts sent to LLM
+
 #### 🔍 Comprehensive Pipeline Tracing
 - **Complete visibility into RAG pipeline execution**
   - Added expandable "Pipeline Trace" panel showing all steps

@@ -351,15 +351,18 @@ if search_button and query:
             status_placeholder.info("🌐 **Step 1/4:** Searching the web...")
         logger.info(f"User query: {query}")
 
+        step1_start = time.time()
         web_contents_fetcher = WebContentFetcher(query)
         web_contents, serper_response = web_contents_fetcher.fetch()
+        step1_time = time.time() - step1_start
 
         # Trace: Search results
         trace_data['search_results'] = {
             'count': serper_response.get('count', 0) if serper_response else 0,
             'urls': serper_response.get('links', []) if serper_response else [],
             'titles': serper_response.get('titles', []) if serper_response else [],
-            'snippets': serper_response.get('snippets', []) if serper_response else []
+            'snippets': serper_response.get('snippets', []) if serper_response else [],
+            'time_taken': step1_time
         }
 
         # Show how many URLs were found
@@ -391,7 +394,8 @@ if search_button and query:
                         st.write(f"{i}. {link}")
                 st.stop()
 
-            # Trace: Scraped content
+            # Trace: Scraped content (scraping already done in step 1)
+            step2_time = step1_time  # Scraping happens inside fetch()
             trace_data['scraped_content'] = {
                 'total_pages': len(web_contents),
                 'successful_scrapes': sum(1 for c in web_contents if c),
@@ -404,7 +408,8 @@ if search_button and query:
                         'preview': c[:200] + '...' if c and len(c) > 200 else (c if c else '[FAILED]')
                     }
                     for i, c in enumerate(web_contents)
-                ]
+                ],
+                'time_taken': step2_time
             }
 
             # Step 2: Fetch content from URLs
@@ -415,16 +420,26 @@ if search_button and query:
             # Step 3: Create embeddings and retrieve relevant documents
             with col2_status:
                 status_placeholder.info("🔍 **Step 3/4:** Creating embeddings and searching...")
+
+            step3_start = time.time()
             retriever = EmbeddingRetriever()
             relevant_docs_list = retriever.retrieve_embeddings(
                 web_contents,
                 serper_response['links'],
                 query
             )
+            step3_time = time.time() - step3_start
+
+            # Get embedding metrics from retriever
+            embedding_metrics = getattr(retriever, 'embedding_metrics', {})
 
             # Trace: Chunks and embeddings with similarity scores
             trace_data['retrieval'] = {
                 'num_relevant_docs': len(relevant_docs_list),
+                'time_taken': step3_time,
+                'embedding_provider': 'Gitee AI (BGE-M3)' if gitee_api_key else 'OpenRouter (text-embedding-3-small)',
+                'embedding_api_calls': embedding_metrics.get('api_calls', 0),
+                'embedding_api_call_details': embedding_metrics.get('api_call_times', []),
                 'relevant_docs': [
                     {
                         'content': doc.page_content[:200] + '...' if len(doc.page_content) > 200 else doc.page_content,
@@ -449,6 +464,16 @@ if search_button and query:
                 relevant_docs_list,
                 serper_response['links']
             )
+
+            # Clean formatted context: remove empty lines and excess whitespace
+            import re
+            # Remove multiple consecutive empty lines (keep max 1 empty line between sections)
+            formatted_relevant_docs = re.sub(r'\n\s*\n\s*\n+', '\n\n', formatted_relevant_docs)
+            # Remove multiple spaces (keep single spaces)
+            formatted_relevant_docs = re.sub(r' {2,}', ' ', formatted_relevant_docs)
+            # Trim trailing/leading whitespace on each line
+            lines = [line.strip() for line in formatted_relevant_docs.split('\n')]
+            formatted_relevant_docs = '\n'.join(lines)
 
             # Clear status and loading animation for streaming output
             status_placeholder.empty()
@@ -708,6 +733,7 @@ if st.session_state.answer and st.session_state.get('trace_data'):
             st.markdown("### 🌐 Step 1: Web Search")
             st.write(f"**Query:** {trace['query']}")
             st.write(f"**Results Found:** {trace['search_results']['count']}")
+            st.write(f"**⏱️ Time Taken:** {trace['search_results']['time_taken']:.2f}s")
 
             if trace['search_results']['urls']:
                 st.markdown("**Search Results:**")
@@ -728,6 +754,7 @@ if st.session_state.answer and st.session_state.get('trace_data'):
             st.write(f"**Total Pages:** {trace['scraped_content']['total_pages']}")
             st.write(f"**Successful:** {trace['scraped_content']['successful_scrapes']}")
             st.write(f"**Failed:** {trace['scraped_content']['failed_scrapes']}")
+            st.write(f"**⏱️ Time Taken:** {trace['scraped_content']['time_taken']:.2f}s")
 
             st.markdown("**Content Lengths:**")
             for i, preview in enumerate(trace['scraped_content']['content_previews'][:10], 1):
@@ -748,7 +775,23 @@ if st.session_state.answer and st.session_state.get('trace_data'):
             # Step 3: Retrieval
             st.markdown("---")
             st.markdown("### 🔍 Step 3: Embedding & Retrieval")
+            st.write(f"**Embedding Provider:** {trace['retrieval']['embedding_provider']}")
             st.write(f"**Relevant Documents Retrieved:** {trace['retrieval']['num_relevant_docs']}")
+            st.write(f"**⏱️ Time Taken:** {trace['retrieval']['time_taken']:.2f}s")
+
+            # Show embedding API call details
+            if trace['retrieval'].get('embedding_api_calls', 0) > 0:
+                st.markdown("**📡 Embedding API Calls:**")
+                st.write(f"Total API calls: {trace['retrieval']['embedding_api_calls']}")
+
+                if trace['retrieval'].get('embedding_api_call_details'):
+                    for i, call in enumerate(trace['retrieval']['embedding_api_call_details'], 1):
+                        call_type = call['type'].replace('_', ' ').title()
+                        st.write(f"  {i}. {call_type}: {call['chunks']} chunk(s) in {call['time']:.3f}s")
+
+                    # Calculate total embedding time
+                    total_embed_time = sum(call['time'] for call in trace['retrieval']['embedding_api_call_details'])
+                    st.write(f"**Total Embedding Time:** {total_embed_time:.3f}s")
 
             st.markdown("**Retrieved Chunks (in order of relevance):**")
             for i, doc in enumerate(trace['retrieval']['relevant_docs'], 1):

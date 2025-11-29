@@ -62,6 +62,14 @@ class EmbeddingRetriever:
                 model='openai/text-embedding-3-small'
             )
 
+        # Store embedding metrics for tracing
+        self.embedding_metrics = {
+            'provider': 'Gitee AI (BGE-M3)' if use_gitee else 'OpenRouter (text-embedding-3-small)',
+            'num_chunks': len(texts),
+            'api_calls': 0,
+            'api_call_times': []
+        }
+
         if CHROMA_AVAILABLE:
             logger.info("Using LangChain Chroma wrapper for retrieval")
             # Use LangChain's Chroma wrapper if available
@@ -99,7 +107,22 @@ class EmbeddingRetriever:
             # Add documents to collection
             doc_texts = [doc.page_content for doc in documents]
             logger.info(f"Generating embeddings for {len(doc_texts)} text chunks...")
+
+            # Track embedding API call
+            import time
+            embed_start = time.time()
             doc_embeddings = embeddings.embed_documents(doc_texts)
+            embed_time = time.time() - embed_start
+
+            # Update metrics
+            self.embedding_metrics['api_calls'] += 1
+            self.embedding_metrics['api_call_times'].append({
+                'type': 'embed_documents',
+                'chunks': len(doc_texts),
+                'time': embed_time
+            })
+            logger.info(f"Document embedding completed in {embed_time:.2f}s")
+
             doc_metadatas = [doc.metadata for doc in documents]
             doc_ids = [f"doc_{i}" for i in range(len(documents))]
 
@@ -113,7 +136,21 @@ class EmbeddingRetriever:
 
             # Query the collection
             logger.info(f"Querying collection for top {self.TOP_K} results")
+
+            # Track query embedding API call
+            query_start = time.time()
             query_embedding = embeddings.embed_query(query)
+            query_time = time.time() - query_start
+
+            # Update metrics
+            self.embedding_metrics['api_calls'] += 1
+            self.embedding_metrics['api_call_times'].append({
+                'type': 'embed_query',
+                'chunks': 1,
+                'time': query_time
+            })
+            logger.info(f"Query embedding completed in {query_time:.2f}s")
+
             results = collection.query(
                 query_embeddings=[query_embedding],
                 n_results=self.TOP_K
