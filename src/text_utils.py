@@ -24,6 +24,10 @@ class RecursiveTextSplitter:
 
         # Try each separator in order
         for separator in self.separators:
+            # Skip empty separator (handle it separately)
+            if separator == "":
+                continue
+
             if separator in text:
                 chunks = []
                 parts = text.split(separator)

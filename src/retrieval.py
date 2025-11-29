@@ -119,11 +119,22 @@ class EmbeddingRetriever:
                 n_results=self.TOP_K
             )
 
-            # Convert results back to Document format
+            # Convert results back to Document format with similarity scores
             from text_utils import Document
             retrieved_docs = []
             if results['documents']:
+                # ChromaDB returns distances, we need to convert to similarity scores
+                # Distance = 1 - cosine_similarity, so similarity = 1 - distance
+                distances = results.get('distances', [[]])[0] if results.get('distances') else []
+
                 for i, (doc_text, metadata) in enumerate(zip(results['documents'][0], results['metadatas'][0])):
+                    # Add similarity score to metadata
+                    if distances and i < len(distances):
+                        similarity_score = 1 - distances[i]  # Convert distance to similarity
+                        metadata['similarity_score'] = round(similarity_score, 4)
+                    else:
+                        metadata['similarity_score'] = None
+
                     retrieved_docs.append(Document(page_content=doc_text, metadata=metadata))
                 logger.info(f"Successfully retrieved {len(retrieved_docs)} documents")
             else:

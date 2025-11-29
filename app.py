@@ -335,6 +335,17 @@ if search_button and query:
             # Status message placeholder
             status_placeholder = st.empty()
 
+        # Initialize trace data storage
+        trace_data = {
+            'query': query,
+            'search_results': {},
+            'scraped_content': {},
+            'chunks': {},
+            'embeddings': {},
+            'retrieval': {},
+            'generation': {}
+        }
+
         # Step 1: Fetch web content
         with col2_status:
             status_placeholder.info("🌐 **Step 1/4:** Searching the web...")
@@ -342,6 +353,14 @@ if search_button and query:
 
         web_contents_fetcher = WebContentFetcher(query)
         web_contents, serper_response = web_contents_fetcher.fetch()
+
+        # Trace: Search results
+        trace_data['search_results'] = {
+            'count': serper_response.get('count', 0) if serper_response else 0,
+            'urls': serper_response.get('links', []) if serper_response else [],
+            'titles': serper_response.get('titles', []) if serper_response else [],
+            'snippets': serper_response.get('snippets', []) if serper_response else []
+        }
 
         # Show how many URLs were found
         if serper_response:
@@ -372,6 +391,22 @@ if search_button and query:
                         st.write(f"{i}. {link}")
                 st.stop()
 
+            # Trace: Scraped content
+            trace_data['scraped_content'] = {
+                'total_pages': len(web_contents),
+                'successful_scrapes': sum(1 for c in web_contents if c),
+                'failed_scrapes': sum(1 for c in web_contents if not c),
+                'content_lengths': [len(c) if c else 0 for c in web_contents],
+                'content_previews': [
+                    {
+                        'url': serper_response['links'][i],
+                        'length': len(c) if c else 0,
+                        'preview': c[:200] + '...' if c and len(c) > 200 else (c if c else '[FAILED]')
+                    }
+                    for i, c in enumerate(web_contents)
+                ]
+            }
+
             # Step 2: Fetch content from URLs
             with col2_status:
                 status_placeholder.info(f"📄 **Step 2/4:** Fetching content from {sum(1 for c in web_contents if c)} pages...")
@@ -386,6 +421,20 @@ if search_button and query:
                 serper_response['links'],
                 query
             )
+
+            # Trace: Chunks and embeddings with similarity scores
+            trace_data['retrieval'] = {
+                'num_relevant_docs': len(relevant_docs_list),
+                'relevant_docs': [
+                    {
+                        'content': doc.page_content[:200] + '...' if len(doc.page_content) > 200 else doc.page_content,
+                        'full_length': len(doc.page_content),
+                        'source': doc.metadata.get('url', 'Unknown'),
+                        'similarity_score': doc.metadata.get('similarity_score', 'N/A')
+                    }
+                    for doc in relevant_docs_list
+                ]
+            }
 
             with col2_status:
                 status_placeholder.success(f"✅ Found {len(relevant_docs_list)} relevant sections")
@@ -441,6 +490,24 @@ if search_button and query:
                 profile=profile_text
             )
 
+            # Trace: Initialize generation data and store prompt/chunks
+            trace_data['generation'] = {
+                'model': content_processor.model_name,
+                'temperature': 0.0,
+                'profile': profile_text,
+                'prompt': summary_prompt,
+                'formatted_context': formatted_relevant_docs,
+                'chunks_sent': [
+                    {
+                        'index': i + 1,
+                        'content': doc.page_content,
+                        'source': doc.metadata.get('url', 'Unknown'),
+                        'similarity_score': doc.metadata.get('similarity_score', 'N/A')
+                    }
+                    for i, doc in enumerate(relevant_docs_list)
+                ]
+            }
+
             # Stream the response
             messages = [{"role": "user", "content": summary_prompt}]
             full_answer = ""
@@ -490,10 +557,18 @@ if search_button and query:
             answer = full_answer
             end_time = time.time()
 
+            # Trace: Update generation info (don't overwrite, update existing data)
+            trace_data['generation'].update({
+                'answer_length': len(full_answer),
+                'answer_preview': full_answer[:300] + '...' if len(full_answer) > 300 else full_answer,
+                'time_taken': end_time - start_time
+            })
+
             # Store results in session state
             st.session_state.answer = answer
             st.session_state.references = serper_response
             st.session_state.search_time = end_time - start_time
+            st.session_state.trace_data = trace_data  # Store trace data
 
             # Clear loading animation
             if lottie_loading:
@@ -615,7 +690,168 @@ if st.session_state.answer and not search_button:
                 st.session_state.answer = None
                 st.session_state.references = None
                 st.session_state.search_time = 0
+                st.session_state.trace_data = None
                 st.rerun()
+
+# Pipeline Trace Section
+if st.session_state.answer and st.session_state.get('trace_data'):
+    col1_trace, col2_trace, col3_trace = st.columns([1, 6, 1])
+
+    with col2_trace:
+        st.markdown("---")
+        st.markdown("## 🔍 Pipeline Trace")
+
+        with st.expander("📊 View Detailed Pipeline Execution Trace", expanded=False):
+            trace = st.session_state.trace_data
+
+            # Step 1: Search Results
+            st.markdown("### 🌐 Step 1: Web Search")
+            st.write(f"**Query:** {trace['query']}")
+            st.write(f"**Results Found:** {trace['search_results']['count']}")
+
+            if trace['search_results']['urls']:
+                st.markdown("**Search Results:**")
+                for i, (url, title, snippet) in enumerate(zip(
+                    trace['search_results']['urls'][:10],
+                    trace['search_results']['titles'][:10],
+                    trace['search_results']['snippets'][:10]
+                ), 1):
+                    with st.container():
+                        st.markdown(f"**{i}. {title}**")
+                        st.caption(url)
+                        st.text(snippet[:150] + '...' if len(snippet) > 150 else snippet)
+                        st.markdown("")
+
+            # Step 2: Scraped Content
+            st.markdown("---")
+            st.markdown("### 📄 Step 2: Content Scraping")
+            st.write(f"**Total Pages:** {trace['scraped_content']['total_pages']}")
+            st.write(f"**Successful:** {trace['scraped_content']['successful_scrapes']}")
+            st.write(f"**Failed:** {trace['scraped_content']['failed_scrapes']}")
+
+            st.markdown("**Content Lengths:**")
+            for i, preview in enumerate(trace['scraped_content']['content_previews'][:10], 1):
+                status = "✅" if preview['length'] > 0 else "❌"
+                st.markdown(f"{status} **{i}. {preview['url']}**")
+                st.write(f"Length: {preview['length']} characters")
+                if preview['length'] > 0:
+                    with st.container():
+                        st.text_area(
+                            f"Preview {i}",
+                            value=preview['preview'],
+                            height=100,
+                            key=f"preview_{i}",
+                            label_visibility="collapsed"
+                        )
+                st.markdown("")
+
+            # Step 3: Retrieval
+            st.markdown("---")
+            st.markdown("### 🔍 Step 3: Embedding & Retrieval")
+            st.write(f"**Relevant Documents Retrieved:** {trace['retrieval']['num_relevant_docs']}")
+
+            st.markdown("**Retrieved Chunks (in order of relevance):**")
+            for i, doc in enumerate(trace['retrieval']['relevant_docs'], 1):
+                with st.container():
+                    # Show similarity score with color coding
+                    score = doc['similarity_score']
+                    if score != 'N/A' and score is not None:
+                        score_color = "green" if score > 0.7 else ("orange" if score > 0.5 else "red")
+                        st.markdown(f"**Chunk {i}** - Similarity Score: <span style='color: {score_color}; font-weight: bold;'>{score:.4f}</span>", unsafe_allow_html=True)
+                    else:
+                        st.markdown(f"**Chunk {i}**")
+
+                    st.caption(f"Source: {doc['source']}")
+                    st.write(f"Length: {doc['full_length']} characters")
+                    st.text_area(
+                        f"Chunk {i} content",
+                        value=doc['content'],
+                        height=120,
+                        key=f"chunk_{i}",
+                        label_visibility="collapsed"
+                    )
+                    st.markdown("")
+
+            # Step 4: Generation
+            st.markdown("---")
+            st.markdown("### 🤖 Step 4: Answer Generation")
+            st.write(f"**Model:** {trace['generation']['model']}")
+            st.write(f"**Profile:** {trace['generation'].get('profile', 'N/A')}")
+            st.write(f"**Temperature:** {trace['generation']['temperature']}")
+            st.write(f"**Answer Length:** {trace['generation']['answer_length']} characters")
+            st.write(f"**Time Taken:** {trace['generation']['time_taken']:.2f} seconds")
+
+            # Show chunks sent to LLM
+            st.markdown("**Chunks Sent to LLM:**")
+            if trace['generation'].get('chunks_sent'):
+                st.write(f"Total chunks: {len(trace['generation']['chunks_sent'])}")
+                for chunk_info in trace['generation']['chunks_sent']:
+                    with st.container():
+                        score = chunk_info.get('similarity_score', 'N/A')
+                        if score != 'N/A' and score is not None:
+                            score_color = "green" if score > 0.7 else ("orange" if score > 0.5 else "red")
+                            st.markdown(f"**Chunk {chunk_info['index']}** - Similarity: <span style='color: {score_color}; font-weight: bold;'>{score:.4f}</span>", unsafe_allow_html=True)
+                        else:
+                            st.markdown(f"**Chunk {chunk_info['index']}**")
+
+                        st.caption(f"Source: {chunk_info['source']}")
+                        st.text_area(
+                            f"LLM Chunk {chunk_info['index']}",
+                            value=chunk_info['content'],
+                            height=100,
+                            key=f"llm_chunk_{chunk_info['index']}",
+                            label_visibility="collapsed"
+                        )
+                        st.markdown("")
+
+            # Show formatted context
+            st.markdown("**Formatted Context (as sent to LLM):**")
+            if trace['generation'].get('formatted_context'):
+                st.text_area(
+                    "Formatted Context",
+                    value=trace['generation']['formatted_context'],
+                    height=200,
+                    key="formatted_context",
+                    label_visibility="collapsed"
+                )
+
+            # Show full prompt
+            st.markdown("**Complete Prompt Sent to LLM:**")
+            if trace['generation'].get('prompt'):
+                st.text_area(
+                    "Full Prompt",
+                    value=trace['generation']['prompt'],
+                    height=300,
+                    key="full_prompt",
+                    label_visibility="collapsed"
+                )
+
+            st.markdown("**Generated Answer:**")
+            st.text_area(
+                "Generated Answer",
+                value=trace['generation']['answer_preview'],
+                height=150,
+                key="answer_preview",
+                label_visibility="collapsed"
+            )
+
+            # Summary Statistics
+            st.markdown("---")
+            st.markdown("### 📈 Summary Statistics")
+
+            col_stat1, col_stat2, col_stat3, col_stat4 = st.columns(4)
+
+            with col_stat1:
+                st.metric("Search Results", trace['search_results']['count'])
+
+            with col_stat2:
+                st.metric("Pages Scraped", trace['scraped_content']['successful_scrapes'])
+
+            with col_stat3:
+                st.metric("Chunks Retrieved", trace['retrieval']['num_relevant_docs'])
+
+            with col_stat4:
+                st.metric("Total Time", f"{trace['generation']['time_taken']:.1f}s")
 
 # Footer
 st.markdown("---")
