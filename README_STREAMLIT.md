@@ -1,4 +1,4 @@
-# SearchGPT Streamlit Interface
+# RelevanceSearch Streamlit Interface
 
 A beautiful AI-powered search engine interface built with Streamlit and integrated with OpenRouter API.
 

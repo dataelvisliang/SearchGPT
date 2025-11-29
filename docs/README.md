@@ -1,4 +1,4 @@
-# SearchGPT Educational Documentation
+# RelevanceSearch Educational Documentation
 
 ## Purpose
 

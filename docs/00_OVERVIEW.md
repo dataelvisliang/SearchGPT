@@ -1,8 +1,8 @@
-# SearchGPT - Complete System Overview
+# RelevanceSearch - Complete System Overview
 
 ## Introduction
 
-SearchGPT is a **Retrieval-Augmented Generation (RAG)** system that combines web search, content extraction, vector embeddings, and large language models to provide accurate, well-sourced answers to user queries.
+RelevanceSearch is a **Retrieval-Augmented Generation (RAG)** system that combines web search, content extraction, vector embeddings, and large language models to provide accurate, well-sourced answers to user queries.
 
 ## What is RAG?
 

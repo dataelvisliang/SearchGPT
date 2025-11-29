@@ -24,7 +24,7 @@ from locate_reference import ReferenceLocator
 
 # Page configuration
 st.set_page_config(
-    page_title="SearchGPT - AI-Powered Search Engine",
+    page_title="RelevanceSearch - AI-Powered Search Engine",
     page_icon="🔍",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -150,7 +150,7 @@ if 'search_time' not in st.session_state:
     st.session_state.search_time = 0
 
 # Header
-st.title("🔍 SearchGPT")
+st.title("🔍 RelevanceSearch")
 
 # Sidebar
 with st.sidebar:
@@ -543,7 +543,7 @@ if search_button and query:
                 "Authorization": f"Bearer {content_processor.api_key}",
                 "Content-Type": "application/json",
                 "HTTP-Referer": "http://localhost",
-                "X-Title": "SearchGPT Application"
+                "X-Title": "RelevanceSearch Application"
             }
             payload = {
                 "model": content_processor.model_name,
@@ -901,7 +901,7 @@ st.markdown("---")
 st.markdown("""
     <div style='text-align: center; color: #666; padding: 20px;'>
         <p>Powered by OpenRouter AI • Built with Streamlit</p>
-        <p>🔍 SearchGPT - Your AI-Powered Research Assistant</p>
+        <p>🔍 RelevanceSearch - Your AI-Powered Research Assistant</p>
     </div>
 """, unsafe_allow_html=True)
 

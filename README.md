@@ -1,4 +1,4 @@
-# SearchGPT - AI-Powered Search Engine
+# RelevanceSearch - AI-Powered Search Engine
 
 An intelligent search engine that combines real-time web search with AI-powered answer generation using OpenRouter API.
 
@@ -33,7 +33,7 @@ An intelligent search engine that combines real-time web search with AI-powered 
 1. **Clone the repository**
 ```bash
 git clone <your-repo-url>
-cd SearchGPT
+cd RelevanceSearch
 ```
 
 2. **Install dependencies**
@@ -80,7 +80,7 @@ python src/main.py
 ## 📁 Project Structure
 
 ```
-SearchGPT/
+RelevanceSearch/
 ├── app.py                      # Streamlit web interface
 ├── src/
 │   ├── main.py                # CLI entry point
@@ -108,7 +108,7 @@ The `src/config/config.yaml` file supports:
 ## 📸 Screenshots
 
 ### Main Interface
-![SearchGPT Interface](assets/SearchGPT.png)
+![RelevanceSearch Interface](assets/SearchGPT.png)
 
 ### Pipeline Trace - Search & Scraping
 ![Pipeline Trace 1](assets/Trace%201.png)
@@ -159,7 +159,7 @@ python src/main.py
 
 ### Pipeline Tracing
 
-SearchGPT provides complete visibility into every step of the RAG pipeline:
+RelevanceSearch provides complete visibility into every step of the RAG pipeline:
 
 - **Step 1 - Search**: See all URLs, titles, and snippets returned by Serper
 - **Step 2 - Scraping**: Track success/failure for each page with content previews

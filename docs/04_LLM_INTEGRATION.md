@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document covers how SearchGPT integrates with Large Language Models (LLMs) to generate comprehensive answers from retrieved content.
+This document covers how RelevanceSearch integrates with Large Language Models (LLMs) to generate comprehensive answers from retrieved content.
 
 ```
 Retrieved Chunks → Format Context → LLM API → Streaming Response → User
@@ -70,7 +70,7 @@ class OpenRouterService:
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
             "HTTP-Referer": "http://localhost",  # Required by OpenRouter
-            "X-Title": "SearchGPT Application"
+            "X-Title": "RelevanceSearch Application"
         }
 
         payload = {
@@ -134,7 +134,7 @@ class OpenRouterService:
                         continue
 ```
 
-## Available Models in SearchGPT
+## Available Models in RelevanceSearch
 
 ### 1. Grok 4.1 Fast (Default)
 
@@ -255,7 +255,7 @@ Modern quantum computers leverage entanglement for computation...
 ```python
 "You are a {profile}."
 
-# Options in SearchGPT:
+# Options in RelevanceSearch:
 profiles = [
     "conscientious researcher",    # Default: balanced, thorough
     "technical expert",            # Technical jargon, precision
@@ -409,7 +409,7 @@ headers = {
     "Authorization": f"Bearer {openrouter_api_key}",
     "Content-Type": "application/json",
     "HTTP-Referer": "http://localhost",
-    "X-Title": "SearchGPT Application"
+    "X-Title": "RelevanceSearch Application"
 }
 
 payload = {
@@ -566,7 +566,7 @@ temperature = 2.0  # Very random (often incoherent)
 **For RAG Systems:**
 
 ```python
-# Factual Q&A (SearchGPT)
+# Factual Q&A (RelevanceSearch)
 temperature = 0.0  # We want consistent, accurate answers
 
 # Creative writing
@@ -700,7 +700,7 @@ result = llm_with_retry(payload, max_retries=3)
 
 ### Free Tier Models
 
-SearchGPT only uses **free models**:
+RelevanceSearch only uses **free models**:
 
 ```python
 FREE_MODELS = [

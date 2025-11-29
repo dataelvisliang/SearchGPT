@@ -1,7 +1,9 @@
-SearchGPT: 集成实时网页浏览功能的GPT
+RelevanceSearch: 集成实时网页浏览功能的AI搜索引擎
 =================================
 
 Languages / 语言: [中文](https://github.com/Wilson-ZheLin/SearchGPT/blob/main/README_CN.md) | [English](https://github.com/Wilson-ZheLin/SearchGPT)
+
+**基于 [Wilson-ZheLin/SearchGPT](https://github.com/Wilson-ZheLin/SearchGPT) 的优秀工作**
 
 GPT的知识库涉及领域丰富、涵盖范围广泛，但是一直有一定的实效滞后，例如最新的GPT-4知识更新截止于2023年4月。为了解决这个限制，我们将实时的网络浏览集成到了 GPT-4 中，将具有时效性的信息结合大语言模型先进的语言处理能力，并且速度要快于网页端 GPT-4 自带的网络浏览。🔗
 
