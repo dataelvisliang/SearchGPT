@@ -34,33 +34,41 @@ This documentation series is designed for learners who want to understand:
    - Similarity search algorithms
    - Prompt engineering for RAG
 
-4. **03_EMBEDDINGS.md** (Coming Soon)
-   - Deep dive into vector representations
-   - Embedding models comparison
-   - BGE-M3 vs OpenAI embeddings
+4. **[03_EMBEDDINGS.md](03_EMBEDDINGS.md)** - Deep Dive into Embeddings
+   - Vector representations explained
+   - Embedding models comparison (BGE-M3 vs OpenAI)
    - Cosine similarity mathematics
-   - Dimensionality reduction
+   - Dimensionality and performance
+   - Caching and optimization strategies
+   - Benchmarking and evaluation
 
-5. **04_LLM_INTEGRATION.md** (Coming Soon)
-   - OpenRouter API details
-   - Streaming responses (SSE)
-   - Token management
+5. **[04_LLM_INTEGRATION.md](04_LLM_INTEGRATION.md)** - LLM Integration
+   - OpenRouter API architecture
+   - Streaming responses with Server-Sent Events
+   - Token management and optimization
    - Model selection (Grok, GPT-OSS)
+   - Prompt engineering for RAG
+   - Error handling and retries
    - Cost optimization
 
-6. **05_STREAMLIT_UI.md** (Coming Soon)
-   - Building interactive web interfaces
-   - State management
+6. **[05_STREAMLIT_UI.md](05_STREAMLIT_UI.md)** - Building Interactive UIs
+   - Streamlit components and layout
+   - State management with session_state
    - Real-time progress indicators
    - Streaming UI updates
-   - CSS animations
+   - CSS animations (spinner, breathing dots)
+   - Tabs, expanders, and advanced widgets
+   - Performance optimization with caching
 
-7. **06_ADVANCED_TOPICS.md** (Coming Soon)
-   - Threading vs Async/Await
-   - API key security
-   - Error recovery patterns
-   - Performance optimization
-   - Production deployment
+7. **[06_ADVANCED_TOPICS.md](06_ADVANCED_TOPICS.md)** - Production Ready
+   - Threading vs Async/Await comparison
+   - API key security best practices
+   - Error recovery patterns (retry, circuit breaker)
+   - Performance optimization techniques
+   - Production deployment (Docker, Cloud)
+   - Monitoring and logging (Prometheus, Sentry)
+   - Testing strategies (unit, integration, performance)
+   - Scaling considerations
 
 ## Learning Path
 
