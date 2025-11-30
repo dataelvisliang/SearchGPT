@@ -2,7 +2,7 @@
 
 An intelligent search engine that combines real-time web search with AI-powered answer generation using OpenRouter API.
 
-**Built on the excellent work of [Wilson-ZheLin/SearchGPT](https://github.com/Wilson-ZheLin/SearchGPT)**
+**🌐 [Live Demo](https://searchgrok.streamlit.app/)** | **Built on the excellent work of [Wilson-ZheLin/SearchGPT](https://github.com/Wilson-ZheLin/SearchGPT)**
 
 ## ✨ Features
 
@@ -108,7 +108,7 @@ The `src/config/config.yaml` file supports:
 ## 📸 Screenshots
 
 ### Main Interface
-![RelevanceSearch Interface](assets/SearchGPT.png)
+![RelevanceSearch Interface](assets/RelevanceSearch.png)
 
 ### Pipeline Trace - Search & Scraping
 ![Pipeline Trace 1](assets/Trace%201.png)
