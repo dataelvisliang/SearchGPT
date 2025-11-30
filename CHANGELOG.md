@@ -4,6 +4,16 @@ All notable changes to RelevanceSearch will be documented in this file.
 
 ## [2.2.1] - 2025-11-29
 
+### Performance Improvements
+
+#### ⚡ Batch Embedding Processing
+- **Dramatically reduced API calls and embedding time**
+  - Implemented batch processing for document embeddings (20 texts per API call)
+  - Reduced 93 individual API calls → ~5 batch calls (18x fewer requests!)
+  - Significantly faster embedding generation
+  - Lower API costs and reduced rate limiting issues
+  - Better logging shows batch progress
+
 ### Bug Fixes
 
 #### 🔄 Improved API Timeout Handling
@@ -15,9 +25,12 @@ All notable changes to RelevanceSearch will be documented in this file.
   - Graceful handling of ReadTimeout exceptions
 
 ### Technical Details
-- Updated `OpenRouterEmbeddings._get_embedding()` method with retry logic
+- Added `OpenRouterEmbeddings._get_batch_embedding()` method for batch processing
+- Updated `OpenRouterEmbeddings.embed_documents()` to use batching
+- Configurable batch size (default: 20 texts per request)
+- Updated `_get_embedding()` method with retry logic
 - Separate handling for timeout vs other request exceptions
-- Detailed logging for each retry attempt
+- Detailed logging for each retry attempt and batch progress
 - Prevents cascading failures during high API load
 
 ## [2.2.0] - 2025-11-28

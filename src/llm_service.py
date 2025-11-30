@@ -235,7 +235,7 @@ class OpenRouterEmbeddings:
 
     def embed_documents(self, texts: list) -> list:
         """
-        Embed a list of documents
+        Embed a list of documents using batching for efficiency
 
         Args:
             texts: List of text strings to embed
@@ -243,10 +243,24 @@ class OpenRouterEmbeddings:
         Returns:
             List of embedding vectors
         """
+        logger.info(f"Embedding {len(texts)} documents with batching")
         embeddings = []
-        for text in texts:
-            embedding = self._get_embedding(text)
-            embeddings.append(embedding)
+
+        # Process in batches to reduce API calls (OpenRouter supports batching)
+        batch_size = 20  # OpenRouter can handle multiple inputs per request
+
+        for i in range(0, len(texts), batch_size):
+            batch = texts[i:i+batch_size]
+            batch_num = i // batch_size + 1
+            total_batches = (len(texts) - 1) // batch_size + 1
+
+            logger.info(f"Processing batch {batch_num}/{total_batches} ({len(batch)} texts)")
+
+            # Get embeddings for entire batch in one API call
+            batch_embeddings = self._get_batch_embedding(batch)
+            embeddings.extend(batch_embeddings)
+
+        logger.info(f"Successfully embedded {len(embeddings)} documents")
         return embeddings
 
     def embed_query(self, text: str) -> list:
@@ -260,6 +274,72 @@ class OpenRouterEmbeddings:
             Embedding vector
         """
         return self._get_embedding(text)
+
+    def _get_batch_embedding(self, texts: list, max_retries: int = 3) -> list:
+        """
+        Get embeddings for a batch of texts in a single API call
+
+        Args:
+            texts: List of text strings to embed
+            max_retries: Maximum number of retry attempts
+
+        Returns:
+            List of embedding vectors
+        """
+        if not self.api_key:
+            raise ValueError("⚠️ OpenRouter API key is required")
+
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+            "HTTP-Referer": "http://localhost",
+            "X-Title": "RelevanceSearch Application"
+        }
+
+        url = "https://openrouter.ai/api/v1/embeddings"
+        payload = {
+            "model": self.model,
+            "input": texts  # Send list of texts for batch processing
+        }
+
+        last_error = None
+        for attempt in range(max_retries):
+            try:
+                timeout = 60 + (attempt * 30)
+                logger.info(f"Batch embedding API call attempt {attempt + 1}/{max_retries} (timeout: {timeout}s)")
+
+                response = requests.post(url, headers=headers, json=payload, timeout=timeout)
+                response.raise_for_status()
+                result = response.json()
+
+                if "data" in result and len(result["data"]) > 0:
+                    # Extract embeddings in order
+                    return [item["embedding"] for item in result["data"]]
+                else:
+                    raise ValueError("Unexpected response format from embeddings API")
+
+            except requests.exceptions.Timeout as e:
+                last_error = e
+                logger.warning(f"Timeout on batch attempt {attempt + 1}/{max_retries}: {e}")
+                if attempt < max_retries - 1:
+                    import time
+                    wait_time = 2 ** attempt
+                    logger.info(f"Waiting {wait_time}s before retry...")
+                    time.sleep(wait_time)
+                continue
+
+            except requests.exceptions.RequestException as e:
+                last_error = e
+                logger.error(f"Request error on batch attempt {attempt + 1}/{max_retries}: {e}")
+                if attempt < max_retries - 1:
+                    import time
+                    wait_time = 2 ** attempt
+                    logger.info(f"Waiting {wait_time}s before retry...")
+                    time.sleep(wait_time)
+                continue
+
+        logger.error(f"All {max_retries} batch attempts failed for embedding API")
+        raise last_error if last_error else Exception("Failed to get batch embeddings after all retries")
 
     def _get_embedding(self, text: str, max_retries: int = 3) -> list:
         """
