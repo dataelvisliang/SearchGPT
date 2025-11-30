@@ -2,6 +2,24 @@
 
 All notable changes to RelevanceSearch will be documented in this file.
 
+## [2.2.1] - 2025-11-29
+
+### Bug Fixes
+
+#### 🔄 Improved API Timeout Handling
+- **Enhanced retry logic for embedding API calls**
+  - Added automatic retry mechanism (up to 3 attempts) for OpenRouter embedding timeouts
+  - Implemented exponential backoff strategy (1s, 2s, 4s delays between retries)
+  - Increased timeout progressively on each retry (60s, 90s, 120s)
+  - Better error logging and debugging information
+  - Graceful handling of ReadTimeout exceptions
+
+### Technical Details
+- Updated `OpenRouterEmbeddings._get_embedding()` method with retry logic
+- Separate handling for timeout vs other request exceptions
+- Detailed logging for each retry attempt
+- Prevents cascading failures during high API load
+
 ## [2.2.0] - 2025-11-28
 
 ### New Features

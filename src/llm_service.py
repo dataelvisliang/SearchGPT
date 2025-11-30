@@ -261,12 +261,13 @@ class OpenRouterEmbeddings:
         """
         return self._get_embedding(text)
 
-    def _get_embedding(self, text: str) -> list:
+    def _get_embedding(self, text: str, max_retries: int = 3) -> list:
         """
-        Get embedding for a single text
+        Get embedding for a single text with retry logic
 
         Args:
             text: Text to embed
+            max_retries: Maximum number of retry attempts
 
         Returns:
             Embedding vector
@@ -288,16 +289,42 @@ class OpenRouterEmbeddings:
             "input": text
         }
 
-        try:
-            response = requests.post(url, headers=headers, json=payload, timeout=60)
-            response.raise_for_status()
-            result = response.json()
+        last_error = None
+        for attempt in range(max_retries):
+            try:
+                # Increase timeout for each retry
+                timeout = 60 + (attempt * 30)  # 60s, 90s, 120s
+                logger.info(f"Embedding API call attempt {attempt + 1}/{max_retries} (timeout: {timeout}s)")
 
-            if "data" in result and len(result["data"]) > 0:
-                return result["data"][0]["embedding"]
-            else:
-                raise ValueError("Unexpected response format from embeddings API")
+                response = requests.post(url, headers=headers, json=payload, timeout=timeout)
+                response.raise_for_status()
+                result = response.json()
 
-        except requests.exceptions.RequestException as e:
-            logging.error(f"Error getting embeddings from OpenRouter: {e}")
-            raise
+                if "data" in result and len(result["data"]) > 0:
+                    return result["data"][0]["embedding"]
+                else:
+                    raise ValueError("Unexpected response format from embeddings API")
+
+            except requests.exceptions.Timeout as e:
+                last_error = e
+                logger.warning(f"Timeout on attempt {attempt + 1}/{max_retries}: {e}")
+                if attempt < max_retries - 1:
+                    import time
+                    wait_time = 2 ** attempt  # Exponential backoff: 1s, 2s, 4s
+                    logger.info(f"Waiting {wait_time}s before retry...")
+                    time.sleep(wait_time)
+                continue
+
+            except requests.exceptions.RequestException as e:
+                last_error = e
+                logger.error(f"Request error on attempt {attempt + 1}/{max_retries}: {e}")
+                if attempt < max_retries - 1:
+                    import time
+                    wait_time = 2 ** attempt
+                    logger.info(f"Waiting {wait_time}s before retry...")
+                    time.sleep(wait_time)
+                continue
+
+        # If we get here, all retries failed
+        logger.error(f"All {max_retries} attempts failed for embedding API")
+        raise last_error if last_error else Exception("Failed to get embedding after all retries")
