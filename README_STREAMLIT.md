@@ -1,4 +1,4 @@
-# RelevanceSearch Streamlit Interface
+# Relevance Search Streamlit Interface
 
 A beautiful AI-powered search engine interface built with Streamlit and integrated with OpenRouter API.
 
@@ -73,6 +73,9 @@ streamlit run app.py
 
 - **x-ai/grok-4.1-fast:free** - GPT-4 equivalent (recommended)
 - **openai/gpt-oss-20b:free** - GPT-3.5 equivalent
+- **nvidia/nemotron-nano-9b-v2:free** - NVIDIA's efficient 9B model
+- **alibaba/tongyi-deepresearch-30b-a3b:free** - Alibaba's research-focused 30B model
+- **z-ai/glm-4.5-air:free** - GLM 4.5 lightweight model
 
 ## Tips
 

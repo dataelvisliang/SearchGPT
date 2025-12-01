@@ -1,8 +1,8 @@
-# RelevanceSearch - Complete System Overview
+# Relevance Search - Complete System Overview
 
 ## Introduction
 
-RelevanceSearch is a **Retrieval-Augmented Generation (RAG)** system that combines web search, content extraction, vector embeddings, and large language models to provide accurate, well-sourced answers to user queries.
+Relevance Search is a **Retrieval-Augmented Generation (RAG)** system that combines web search, content extraction, vector embeddings, and large language models to provide accurate, well-sourced answers to user queries.
 
 ## What is RAG?
 

@@ -24,7 +24,7 @@ from locate_reference import ReferenceLocator
 
 # Page configuration
 st.set_page_config(
-    page_title="RelevanceSearch - AI-Powered Search Engine",
+    page_title="Relevance Search - AI-Powered Search Engine",
     page_icon="🔍",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -150,7 +150,7 @@ if 'search_time' not in st.session_state:
     st.session_state.search_time = 0
 
 # Header
-st.title("🔍 RelevanceSearch")
+st.title("🔍 Relevance Search")
 
 # Sidebar
 with st.sidebar:
@@ -225,8 +225,11 @@ with st.sidebar:
     model_name = st.selectbox(
         "LLM Model",
         [
+            "nvidia/nemotron-nano-9b-v2:free",
             "x-ai/grok-4.1-fast:free",
-            "openai/gpt-oss-20b:free"
+            "openai/gpt-oss-20b:free",
+            "alibaba/tongyi-deepresearch-30b-a3b:free",
+            "z-ai/glm-4.5-air:free"
         ],
         help="Free models via OpenRouter"
     )
@@ -543,7 +546,7 @@ if search_button and query:
                 "Authorization": f"Bearer {content_processor.api_key}",
                 "Content-Type": "application/json",
                 "HTTP-Referer": "http://localhost",
-                "X-Title": "RelevanceSearch Application"
+                "X-Title": "Relevance Search Application"
             }
             payload = {
                 "model": content_processor.model_name,
@@ -901,7 +904,7 @@ st.markdown("---")
 st.markdown("""
     <div style='text-align: center; color: #666; padding: 20px;'>
         <p>Powered by OpenRouter AI • Built with Streamlit</p>
-        <p>🔍 RelevanceSearch - Your AI-Powered Research Assistant</p>
+        <p>🔍 Relevance Search - Your AI-Powered Research Assistant</p>
     </div>
 """, unsafe_allow_html=True)
 

@@ -56,9 +56,9 @@ Different embedding models use different dimensions:
 - **More dimensions**: Captures more nuance, requires more storage/computation
 - **Fewer dimensions**: Faster, more efficient, still captures main concepts
 
-In RelevanceSearch, we use **384 dimensions** as a good balance.
+In Relevance Search, we use **384 dimensions** as a good balance.
 
-## Embedding Models in RelevanceSearch
+## Embedding Models in Relevance Search
 
 ### Option 1: OpenRouter (text-embedding-3-small)
 
@@ -242,7 +242,7 @@ sim2 = cosine_similarity(query_vec, doc2_vec)  # -0.623 (dissimilar)
 - Q to D1: Small angle → High similarity (0.95)
 - Q to D2: Large angle → Low similarity (0.12)
 
-### Real Example from RelevanceSearch
+### Real Example from Relevance Search
 
 ```python
 Query: "What is quantum entanglement?"
@@ -423,7 +423,7 @@ embeddings = embed_batch(texts)  # 1 second for all 100
 # Total: 1 second (10× faster!)
 ```
 
-**Implementation in RelevanceSearch:**
+**Implementation in Relevance Search:**
 
 ```python
 def embed_documents(self, texts: list) -> list:
@@ -551,7 +551,7 @@ be described independently of the other..."
 # ✓ Complete idea, good context
 ```
 
-**RelevanceSearch uses 500 characters (~100 words)**
+**Relevance Search uses 500 characters (~100 words)**
 
 ### 2. Handling Special Characters
 

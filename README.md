@@ -1,4 +1,4 @@
-# RelevanceSearch - AI-Powered Search Engine
+# Relevance Search - AI-Powered Search Engine
 
 An intelligent search engine that combines real-time web search with AI-powered answer generation using OpenRouter API.
 
@@ -33,7 +33,7 @@ An intelligent search engine that combines real-time web search with AI-powered 
 1. **Clone the repository**
 ```bash
 git clone <your-repo-url>
-cd RelevanceSearch
+cd Relevance Search
 ```
 
 2. **Install dependencies**
@@ -70,6 +70,9 @@ python src/main.py
 ### Free Models (via OpenRouter)
 - **x-ai/grok-4.1-fast:free** - GPT-4 equivalent (recommended)
 - **openai/gpt-oss-20b:free** - GPT-3.5 equivalent
+- **nvidia/nemotron-nano-9b-v2:free** - NVIDIA's efficient 9B model
+- **alibaba/tongyi-deepresearch-30b-a3b:free** - Alibaba's research-focused 30B model
+- **z-ai/glm-4.5-air:free** - GLM 4.5 lightweight model
 
 ### Premium Models (require credits)
 - openai/gpt-3.5-turbo
@@ -80,7 +83,7 @@ python src/main.py
 ## 📁 Project Structure
 
 ```
-RelevanceSearch/
+Relevance Search/
 ├── app.py                      # Streamlit web interface
 ├── src/
 │   ├── main.py                # CLI entry point
@@ -108,7 +111,7 @@ The `src/config/config.yaml` file supports:
 ## 📸 Screenshots
 
 ### Main Interface
-![RelevanceSearch Interface](assets/RelevanceSearch.png)
+![Relevance Search Interface](assets/Relevance Search.png)
 
 ### Pipeline Trace - Search & Scraping
 ![Pipeline Trace 1](assets/Trace%201.png)
@@ -159,7 +162,7 @@ python src/main.py
 
 ### Pipeline Tracing
 
-RelevanceSearch provides complete visibility into every step of the RAG pipeline:
+Relevance Search provides complete visibility into every step of the RAG pipeline:
 
 - **Step 1 - Search**: See all URLs, titles, and snippets returned by Serper
 - **Step 2 - Scraping**: Track success/failure for each page with content previews

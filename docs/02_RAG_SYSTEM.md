@@ -52,7 +52,7 @@ Output:
    [2] wikipedia.org/photosynthesis"
 ```
 
-## RAG Architecture in RelevanceSearch
+## RAG Architecture in Relevance Search
 
 ### High-Level Flow
 

@@ -1,4 +1,4 @@
-# RelevanceSearch Educational Documentation
+# Relevance Search Educational Documentation
 
 ## Purpose
 

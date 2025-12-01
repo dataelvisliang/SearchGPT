@@ -21,7 +21,7 @@ st.write(f"Hello, {name}!")
 # 4 lines of code!
 ```
 
-## RelevanceSearch UI Architecture
+## Relevance Search UI Architecture
 
 ### Component Structure
 
@@ -51,7 +51,7 @@ app.py
 import streamlit as st
 
 st.set_page_config(
-    page_title="RelevanceSearch",
+    page_title="Relevance Search",
     page_icon="🔍",
     layout="wide",                 # Use full width
     initial_sidebar_state="expanded"  # Show sidebar by default
@@ -227,7 +227,7 @@ col1, col2, col3 = st.columns([1, 6, 1])
 
 with col2:
     # All content goes in middle column
-    st.title("🔍 RelevanceSearch")
+    st.title("🔍 Relevance Search")
     query = st.text_input("Ask me anything...")
 ```
 
@@ -787,7 +787,7 @@ if st.session_state.processed:
 
 ```python
 # Main heading
-st.title("🔍 RelevanceSearch")
+st.title("🔍 Relevance Search")
 
 # Section headings
 st.markdown("## 📊 Search Results")

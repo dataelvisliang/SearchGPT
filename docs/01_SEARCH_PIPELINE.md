@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document explains how RelevanceSearch discovers and extracts information from the web - the first two steps of the RAG pipeline.
+This document explains how Relevance Search discovers and extracts information from the web - the first two steps of the RAG pipeline.
 
 ```
 User Query → Serper API → URLs → Web Crawler → Text Content

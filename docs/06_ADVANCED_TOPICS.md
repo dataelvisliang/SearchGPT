@@ -17,7 +17,7 @@
 
 ### Threading (Current Implementation)
 
-RelevanceSearch uses threading for web scraping:
+Relevance Search uses threading for web scraping:
 
 ```python
 import threading
@@ -98,7 +98,7 @@ results = asyncio.run(scrape_all_urls(urls))
 | **Libraries** | Most work | Need async versions |
 | **Performance** | Good | Excellent |
 
-**Recommendation for RelevanceSearch:**
+**Recommendation for Relevance Search:**
 - **Current scale (10 URLs)**: Threading is perfect ✓
 - **If scaling to 100+ URLs**: Consider async migration
 
@@ -155,7 +155,7 @@ if not api_key:
     raise ValueError("OPENROUTER_API_KEY not found in environment")
 ```
 
-### Temporary Config Files (RelevanceSearch Approach)
+### Temporary Config Files (Relevance Search Approach)
 
 ```python
 # Read user input
@@ -1047,7 +1047,7 @@ if st.button("Search"):
 
 ### Next Steps
 
-Congratulations! You've completed the RelevanceSearch learning series. You now understand:
+Congratulations! You've completed the Relevance Search learning series. You now understand:
 
 ✓ RAG system architecture
 ✓ Vector embeddings and similarity search
@@ -1059,7 +1059,7 @@ Congratulations! You've completed the RelevanceSearch learning series. You now u
 - Build your own RAG variations
 - Experiment with different embedding models
 - Try alternative LLMs
-- Contribute to the RelevanceSearch project
+- Contribute to the Relevance Search project
 - Share your knowledge with others!
 
 Happy building! 🚀

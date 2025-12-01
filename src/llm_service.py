@@ -52,7 +52,7 @@ class OpenRouterService:
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
             "HTTP-Referer": "http://localhost",
-            "X-Title": "RelevanceSearch Application"
+            "X-Title": "Relevance Search Application"
         }
 
         payload = {
@@ -293,7 +293,7 @@ class OpenRouterEmbeddings:
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
             "HTTP-Referer": "http://localhost",
-            "X-Title": "RelevanceSearch Application"
+            "X-Title": "Relevance Search Application"
         }
 
         url = "https://openrouter.ai/api/v1/embeddings"
@@ -359,7 +359,7 @@ class OpenRouterEmbeddings:
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
             "HTTP-Referer": "http://localhost",
-            "X-Title": "RelevanceSearch Application"
+            "X-Title": "Relevance Search Application"
         }
 
         # OpenRouter uses the same embeddings endpoint as OpenAI

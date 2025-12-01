@@ -1,4 +1,4 @@
-RelevanceSearch: 集成实时网页浏览功能的AI搜索引擎
+Relevance Search: 集成实时网页浏览功能的AI搜索引擎
 =================================
 
 Languages / 语言: [中文](https://github.com/Wilson-ZheLin/SearchGPT/blob/main/README_CN.md) | [English](https://github.com/Wilson-ZheLin/SearchGPT)

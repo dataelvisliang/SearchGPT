@@ -1,6 +1,26 @@
 # Changelog
 
-All notable changes to RelevanceSearch will be documented in this file.
+All notable changes to Relevance Search will be documented in this file.
+
+## [2.2.2] - 2025-11-30
+
+### New Features
+
+#### 🆓 Additional Free LLM Models
+- **Added 3 new free models via OpenRouter**
+  - `nvidia/nemotron-nano-9b-v2:free` - NVIDIA's efficient 9B parameter model
+  - `alibaba/tongyi-deepresearch-30b-a3b:free` - Alibaba's 30B research-focused model
+  - `z-ai/glm-4.5-air:free` - GLM 4.5 lightweight model for fast responses
+
+### Documentation
+- Updated README.md with new model listings
+- Updated README_STREAMLIT.md with new free models
+- All models available in the Streamlit UI dropdown
+
+### Benefits
+- More model choices for users
+- Different model strengths (efficiency, research, multilingual)
+- All completely free via OpenRouter
 
 ## [2.2.1] - 2025-11-29
 

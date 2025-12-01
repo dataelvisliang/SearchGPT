@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document covers how RelevanceSearch integrates with Large Language Models (LLMs) to generate comprehensive answers from retrieved content.
+This document covers how Relevance Search integrates with Large Language Models (LLMs) to generate comprehensive answers from retrieved content.
 
 ```
 Retrieved Chunks → Format Context → LLM API → Streaming Response → User
@@ -70,7 +70,7 @@ class OpenRouterService:
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
             "HTTP-Referer": "http://localhost",  # Required by OpenRouter
-            "X-Title": "RelevanceSearch Application"
+            "X-Title": "Relevance Search Application"
         }
 
         payload = {
@@ -134,7 +134,7 @@ class OpenRouterService:
                         continue
 ```
 
-## Available Models in RelevanceSearch
+## Available Models in Relevance Search
 
 ### 1. Grok 4.1 Fast (Default)
 
@@ -255,7 +255,7 @@ Modern quantum computers leverage entanglement for computation...
 ```python
 "You are a {profile}."
 
-# Options in RelevanceSearch:
+# Options in Relevance Search:
 profiles = [
     "conscientious researcher",    # Default: balanced, thorough
     "technical expert",            # Technical jargon, precision
@@ -409,7 +409,7 @@ headers = {
     "Authorization": f"Bearer {openrouter_api_key}",
     "Content-Type": "application/json",
     "HTTP-Referer": "http://localhost",
-    "X-Title": "RelevanceSearch Application"
+    "X-Title": "Relevance Search Application"
 }
 
 payload = {
@@ -566,7 +566,7 @@ temperature = 2.0  # Very random (often incoherent)
 **For RAG Systems:**
 
 ```python
-# Factual Q&A (RelevanceSearch)
+# Factual Q&A (Relevance Search)
 temperature = 0.0  # We want consistent, accurate answers
 
 # Creative writing
@@ -700,7 +700,7 @@ result = llm_with_retry(payload, max_retries=3)
 
 ### Free Tier Models
 
-RelevanceSearch only uses **free models**:
+Relevance Search only uses **free models**:
 
 ```python
 FREE_MODELS = [
