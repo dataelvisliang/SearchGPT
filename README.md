@@ -67,18 +67,13 @@ python src/main.py
 
 ## 🎯 Available Models
 
-### Free Models (via OpenRouter)
-- **x-ai/grok-4.1-fast:free** - GPT-4 equivalent (recommended)
+All models are **completely free** via OpenRouter:
+
+- **nvidia/nemotron-nano-9b-v2:free** - NVIDIA's efficient 9B model (default)
+- **x-ai/grok-4.1-fast:free** - GPT-4 equivalent
 - **openai/gpt-oss-20b:free** - GPT-3.5 equivalent
-- **nvidia/nemotron-nano-9b-v2:free** - NVIDIA's efficient 9B model
 - **alibaba/tongyi-deepresearch-30b-a3b:free** - Alibaba's research-focused 30B model
 - **z-ai/glm-4.5-air:free** - GLM 4.5 lightweight model
-
-### Premium Models (require credits)
-- openai/gpt-3.5-turbo
-- openai/gpt-4
-- anthropic/claude-3-haiku
-- anthropic/claude-3-sonnet
 
 ## 📁 Project Structure
 
