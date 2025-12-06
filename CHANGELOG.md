@@ -2,25 +2,43 @@
 
 All notable changes to Relevance Search will be documented in this file.
 
-## [2.2.2] - 2025-11-30
+## [2.3.0] - 2025-11-30
 
 ### New Features
 
-#### 🆓 Additional Free LLM Models
-- **Added 3 new free models via OpenRouter**
-  - `nvidia/nemotron-nano-9b-v2:free` - NVIDIA's efficient 9B parameter model
-  - `alibaba/tongyi-deepresearch-30b-a3b:free` - Alibaba's 30B research-focused model
-  - `z-ai/glm-4.5-air:free` - GLM 4.5 lightweight model for fast responses
+#### 🤖 Updated Free Model Selection
+- **Refreshed model lineup with latest free models**
+  - Removed: `x-ai/grok-4.1-fast:free`, `openai/gpt-oss-20b:free`, `z-ai/glm-4.5-air:free`
+  - Added: `qwen/qwen3-4b:free` - Alibaba's compact Qwen3 4B model
+  - Added: `amazon/nova-2-lite-v1:free` - Amazon's Nova 2 Lite model (new default)
+  - Kept: `nvidia/nemotron-nano-9b-v2:free`
+  - Kept: `alibaba/tongyi-deepresearch-30b-a3b:free`
+
+### UI Improvements
+- **Renamed "Source References" to "Search Results"**
+  - Clarifies that this section shows all web sources found
+  - Distinguishes from AI-generated citations in the answer
+  - Better user understanding of what sources were available
+
+### Technical Details
+- Updated model dropdown to 4 curated free models
+- Serper API configured with explicit num=10 parameter (free tier limit)
+- Retrieval uses TOP_K=10 for LLM context
+- Fixed UI bug where sections displayed on model switch
+- Fixed UI bug where sections didn't display after search completion
+
+### Benefits
+- More focused model selection with proven performers
+- All models remain completely free
+- Clearer distinction between searched sources and AI citations
+
+## [2.2.2] - 2025-11-30
 
 ### Documentation
+- Removed premium model references
 - Updated README.md with new model listings
 - Updated README_STREAMLIT.md with new free models
 - All models available in the Streamlit UI dropdown
-
-### Benefits
-- More model choices for users
-- Different model strengths (efficiency, research, multilingual)
-- All completely free via OpenRouter
 
 ## [2.2.1] - 2025-11-29
 

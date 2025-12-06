@@ -26,9 +26,10 @@ class SerperClient:
             "Content-Type": "application/json"
         }
 
-    def serper(self, query: str):
+    def serper(self, query: str, num_results: int = 10):
         # Configure the query parameters for Serper API
-        serper_settings = {"q": query}
+        # Serper API supports up to 10 results per request in the free tier
+        serper_settings = {"q": query, "num": num_results}
 
         # Check if the query contains Chinese characters and adjust settings accordingly
         if self._contains_chinese(query):
@@ -36,7 +37,7 @@ class SerperClient:
             logger.info(f"Chinese query detected. Settings: {serper_settings}")
 
         payload = json.dumps(serper_settings)
-        logger.info(f"Sending Serper API request for query: '{query}'")
+        logger.info(f"Sending Serper API request for query: '{query}' (requesting {num_results} results)")
 
         try:
             # Perform the POST request to the Serper API and return the JSON response

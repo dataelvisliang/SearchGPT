@@ -225,11 +225,10 @@ with st.sidebar:
     model_name = st.selectbox(
         "LLM Model",
         [
+            "amazon/nova-2-lite-v1:free",
             "nvidia/nemotron-nano-9b-v2:free",
-            "x-ai/grok-4.1-fast:free",
-            "openai/gpt-oss-20b:free",
-            "alibaba/tongyi-deepresearch-30b-a3b:free",
-            "z-ai/glm-4.5-air:free"
+            "qwen/qwen3-4b:free",
+            "alibaba/tongyi-deepresearch-30b-a3b:free"
         ],
         help="Free models via OpenRouter"
     )
@@ -283,6 +282,9 @@ with col2:
 
 # Perform search
 if search_button and query:
+    # Reset search_complete flag when starting new search
+    st.session_state.search_complete = False
+
     # Validate API keys
     if not openrouter_api_key and not config_has_keys:
         st.error("❌ Please enter your OpenRouter API key in the sidebar.")
@@ -597,6 +599,7 @@ if search_button and query:
             st.session_state.references = serper_response
             st.session_state.search_time = end_time - start_time
             st.session_state.trace_data = trace_data  # Store trace data
+            st.session_state.search_complete = True  # Mark search as complete
 
             # Clear loading animation
             if lottie_loading:
@@ -611,6 +614,9 @@ if search_button and query:
                     st_lottie(lottie_success, height=150, key="success")
                 time.sleep(1)
                 success_placeholder.empty()
+
+            # Trigger rerun to display the full answer and references sections
+            st.rerun()
 
     except Exception as e:
         logger.error(f"Error during search: {e}", exc_info=True)
@@ -640,8 +646,8 @@ if search_button and query:
             with open(config_path, 'w') as file:
                 file.write(original_config)
 
-# Display results (only if not streaming - streaming already displayed above)
-if st.session_state.answer and not search_button:
+# Display results (only if search is complete and not currently searching)
+if st.session_state.get('search_complete', False) and st.session_state.answer and not search_button:
     st.markdown("---")
 
     # Answer section with markdown rendering
@@ -650,12 +656,12 @@ if st.session_state.answer and not search_button:
         st.markdown("## 💡 AI-Generated Answer")
         st.markdown(st.session_state.answer)
 
-    # References section in centered columns
+    # Search results section in centered columns
     if st.session_state.references:
         col1_ref, col2_ref, col3_ref = st.columns([1, 6, 1])
         with col2_ref:
             st.markdown("---")
-            st.markdown("## 📚 Source References")
+            st.markdown("## 🔍 Search Results")
 
             # Create tabs for different views
             tab1, tab2 = st.tabs(["📋 Quick Links", "🔗 Detailed Sources"])
